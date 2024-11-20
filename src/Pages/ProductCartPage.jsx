@@ -1,28 +1,25 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Header from "../Components/Header";
 import useFetch from "../useFetch";
 import StarRating from "../Components/StarRating";
 import { Link } from "react-router-dom";
+import { CartContext } from "../Contexts/CartContext";
+import { WishlistContext } from "../Contexts/WishlistContext";
 
 const ProductCartPage = () => {
-  const [cartList, setCartList] = useState([]);
+  const { cartList, deleteProductFromCart, loading, error } =
+    useContext(CartContext);
+
+  const { wishlist, addToWishlist, removeFromWishlist } =
+    useContext(WishlistContext);
+
   const [deleteAlert, setDeleteAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [alertMessageForWishlist, setAlertMessageForWishlist] = useState(false);
   const [wishlistData, setWishlistData] = useState([]);
   const [newStore, setNewStore] = useState([]);
-
-  //******************* get All the cart products data *******************
-  const { data, loading, error } = useFetch(
-    "https://e-commerce-app-backend-seven.vercel.app/cart/get/products"
-  );
-
-  useEffect(() => {
-    if (data) {
-      console.log("Data from cart in cart Page", data);
-      setCartList(data.products);
-    }
-  }, [data]);
+  const [quantity, setQuantity] = useState(1);
 
   //******************** Error Handling ********************
   if (error) {
@@ -34,57 +31,23 @@ const ProductCartPage = () => {
   }
 
   //*************** Delete product from cart ***************
-  const DeleteProductFromCart = async (product) => {
-    try {
-      const response = await fetch(
-        `https://e-commerce-app-backend-seven.vercel.app/product/cart/delete/${product.productInfo._id}`,
-        { method: "DELETE" }
-      );
-      console.log("response", response);
-
-      if (!response.ok) {
-        console.log("Error in response from product cart delete.");
-      }
-
-      const data = await response.json();
-
-      setDeleteAlert(true);
-      setTimeout(() => setDeleteAlert(false), 1000);
-
-      setCartList(
-        cartList.filter(
-          (cart) => cart.productInfo._id !== product.productInfo._id
-        )
-      );
-      console.log("Deleted from Cart.", data);
-    } catch (error) {
-      console.log("Error in deleting Product from cart.", error);
-    }
+  const deleteCartHandler = (data) => {
+    deleteProductFromCart(data);
+    setDeleteAlert(true);
+    setTimeout(() => setDeleteAlert(false), 1000);
   };
 
   // To check the cart product and wishlist product are same wishlist
 
   // for getting wishlist data
-  const {
-    data: moreData,
-    loading: moreLoading,
-    error: moreError,
-  } = useFetch(
-    "https://e-commerce-app-backend-seven.vercel.app/wishlist/products"
-  );
-
   useEffect(() => {
-    if (moreData) {
-      console.log("WISHLIST DATA from product PAge:", moreData.products);
-      setWishlistData(moreData.products);
+    if (wishlist) {
+      setWishlistData(wishlist);
     }
-  }, [moreData]);
-  if (moreLoading) {
-    console.log("moreLoading..");
-  }
-  console.log("WISHLIST DATA FROM CART P:", wishlistData);
-  console.log("cartList", cartList);
+  }, [wishlist]);
 
+  console.log("WISHLIST DATA FROM CART :", wishlistData);
+  console.log("cartList", cartList);
 
   // Matching cart data with wishlist data.
   useEffect(() => {
@@ -96,7 +59,8 @@ const ProductCartPage = () => {
         const wishlistProductId = wishlistItem.productInfo?._id;
         if (wishlistProductId) {
           const matchingProduct = cartList.find(
-            (product) => String(product.productInfo._id) === String(wishlistProductId)
+            (product) =>
+              String(product.productInfo._id) === String(wishlistProductId)
           );
           if (matchingProduct) {
             if (!newStore.includes(wishlistProductId)) {
@@ -114,43 +78,46 @@ const ProductCartPage = () => {
       // Update newStore with matched product ids
       if (matchedProducts.length > 0) {
         setNewStore(matchedProducts);
+      }
     }
-}
-}, [cartList, wishlistData]);
+  }, [cartList, wishlistData]);
 
-console.log("NEW STORE:::::",newStore)
+  console.log("NEW STORE:::::", newStore);
 
   //****************** adding products to wishlist ******************
-  const addToWishlist = async (product) => {
-    try {
-      const response = await fetch(
-        "https://e-commerce-app-backend-seven.vercel.app/products/wishlist",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(product),
-        }
-      );
-      if (!response.ok) {
-        console.log("Network response is not okay for wishlist.");
-      }
-      const data = await response.json();
-      console.log("Response Data:", data);
+  const addToWishlistHandler = async (product) => {
+    addToWishlist(product.productInfo);
+    setAlertMessage(true);
+    setTimeout(() => {
+      setAlertMessage(false);
+    }, 1000);
+  };
 
-      setAlertMessage(true);
-
-      setTimeout(() => {
-        setAlertMessage(false);
-      }, 1000);
-    } catch (error) {
-      console.log("Error adding product to wishlist:", error);
-    }
+  //****************** Removing product from wishlist ******************
+  const removefromwishlistHandler = async (product) => {
+    console.log("remove from wish list Handler :- ", product.productInfo);
+    removeFromWishlist(product.productInfo);
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 1000);
   };
 
   // alert message for wishlist
   const setAlertForWishlist = () => {
     setAlertMessageForWishlist(true);
     setTimeout(() => setAlertMessageForWishlist(false), 1000);
+  };
+
+  const handleIncrement = () => {
+    if (quantity < 10) {
+      setQuantity((prevQuantity) => prevQuantity + 1);
+    }
+  };
+  const handleDecrement = () => {
+    if (quantity > 1) {
+      setQuantity((prevQuantity) => prevQuantity - 1);
+    }
   };
 
   return (
@@ -164,6 +131,11 @@ console.log("NEW STORE:::::",newStore)
               <span className="fs-5 fw-medium">Added to Wishlist.</span>
             </div>
           )}
+          {showAlert && (
+            <div className="alert alert-success text-center" role="alert">
+              <span className="fs-5 fw-medium">Remove from Wishlist.</span>
+            </div>
+          )}
           {deleteAlert && (
             <div className="alert alert-success text-center" role="alert">
               <span className="fs-5 fw-medium">Item removed from cart</span>
@@ -175,71 +147,147 @@ console.log("NEW STORE:::::",newStore)
             </div>
           )}
 
-          {/******************** Display Cart Data ********************/}
-          {cartList.length != 0 ? (
-            <div className="row">
-              {cartList?.map((data) => (
-                <div key={data._id} className="col-md-3">
-                  <div
-                    className="card position-relative mb-4"
-                    style={{ borderRadius: "0px" }}
-                  >
-                    <span className="position-absolute top-0 mt-3 ms-2">
-                      <StarRating rating={data.productInfo.rating} />
-                    </span>
-                    <i
-                      onClick={() => addToWishlist(data)}
-                      className={`bi ${
-                        newStore.find((prod) => prod == data.productInfo._id)
-                          ? "bi-heart-fill text-danger"
-                          : "bi-heart"
-                      }  position-absolute top-0 end-0 me-3 mt-2 fs-1`}
-                    ></i>
+          <div className="row px-5">
+            <div className="col-md-7">
+              {/******************** Display Cart Data ********************/}
+              {cartList.length != 0 ? (
+                <div className="row">
+                  {cartList?.map((data) => (
+                    <div key={data._id} className="col-md-12">
+                      <div className="card mb-3">
+                        <div className="row g-0">
+                          {/* Image Column */}
+                          <div className="col-md-4">
+                            <Link to={`/productsPage/${data.productInfo._id}`}>
+                              <img
+                                src={data.productInfo.productImg}
+                                className="img-fluid rounded-start"
+                                alt="Clothing Image"
+                                style={{
+                                  height: "100%",
+                                  width: "100%",
+                                  objectFit: "cover",
+                                }}
+                              />
+                            </Link>
+                          </div>
 
-                    <Link to={`/productsPage/${data.productInfo._id}`}>
-                      {" "}
-                      <img
-                        src={data.productInfo.productImg}
-                        className="card-img-top"
-                        alt="Clothing Image"
-                        style={{
-                          height: "15rem",
-                          objectFit: "cover",
-                          borderRadius: "0px",
-                        }}
-                      />{" "}
-                    </Link>
-                    <div className="card-body text-center p-0">
-                      <p className="card-title fs-5 fw-normal pt-3">
-                        {data.productInfo.name} <span>({data.productInfo.quantity})</span> 
-                      </p> 
-                      <p className="card-text py-0 px-3 fs-4 fw-medium">
-                        ₹ {data.productInfo.price}
-                      </p>
-                      <button
-                        onClick={() => DeleteProductFromCart(data)}
-                        className="btn btn-danger text-light w-100 fs-5 fw-medium"
-                        style={{ borderRadius: "0px" }}
-                      >
-                        Remove Item
-                      </button>
+                          {/* Card Body Column */}
+                          <div className="col-md-8 position-relative">
+                            <div className="card-body">
+                              {/* Product Name and Quantity */}
+                              <h5 className="card-title display-6 fw-medium my-2">
+                                {data.productInfo.name}
+                                {/* <span>({data.productInfo.quantity})</span> */}
+                              </h5>
+
+                              {/* Star Rating */}
+                              <p className="mb-0 my-2">
+                                <StarRating rating={data.productInfo.rating} />
+                              </p>
+
+                              <div className="pt-2 pb-2">
+                                <span className="fs-5 fw-medium me-2">
+                                  Quantity:{" "}
+                                </span>
+                                <button
+                                  className="rounded bg-light"
+                                  onClick={handleIncrement}
+                                >
+                                  <i class="bi bi-plus"></i>
+                                </button>
+                                <span className="mx-2">
+                                  {data.productInfo.quantity}
+                                </span>
+                                <button
+                                  className="rounded bg-light"
+                                  onClick={handleDecrement}
+                                >
+                                  <i class="bi bi-dash"></i>
+                                </button>
+                              </div>
+
+                              {/* Price */}
+                              <p className="card-text fs-5 fw-medium">
+                                ₹ {data.productInfo.price}
+                              </p>
+
+                              {/************* Wishlist button *************/}
+                              <button                           
+                                onClick={(e) => {
+                                  if (e.target.innerText === "Add To Wishlist") {
+                                    addToWishlistHandler(data);
+                                    e.target.innerText = "Remove From Wishlist";
+                                  } else {
+                                    removefromwishlistHandler(data);
+                                    e.target.innerText = "Add To Wishlist";
+                                  }
+                                }}
+                                className="my-2 btn btn-secondary text-light w-100 fs-5 fw-medium"
+                                style={{ borderRadius: "0px" }}
+                              >
+                                {newStore.find(
+                                  (prod) => prod === data.productInfo._id
+                                )
+                                  ? "Remove From Wishlist"
+                                  : "Add To Wishlist"}
+                              </button>
+
+                              {/****************** Remove From Cart Button ******************/}
+                              <button
+                                onClick={() =>
+                                  deleteCartHandler(data.productInfo)
+                                }
+                                className="btn btn-danger text-light w-100 fs-5 fw-medium"
+                                style={{ borderRadius: "0px" }}
+                              >
+                                Remove Item
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                loading && (
+                  <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ height: "90vh" }}
+                  >
+                    <div className="spinner-border text-danger" role="status">
+                      <span className="visually-hidden">Loading...</span>
                     </div>
                   </div>
-                </div>
-              ))}
+                )
+              )}
             </div>
-          ) : (
-            loading && (
-              <div
-                className="d-flex justify-content-center align-items-center"
-                style={{ height: "90vh" }}
-              >
-                <div className="spinner-border text-danger" role="status">
-                  <span className="visually-hidden">Loading...</span>
-                </div>
+            <div className="col-md-5">
+              <div className="border rounded text-center p-5">
+                <h1>
+                  Total Product (
+                  {cartList.reduce(
+                    (acc, curr) =>
+                      (acc = acc + parseInt(curr.productInfo.quantity)),
+                    0
+                  )}
+                  )
+                </h1>
+                <h2 className="my-3 mb-4">
+                  Total Price: ₹{" "}
+                  {cartList.reduce(
+                    (acc, curr) =>
+                      (acc = acc + parseInt(curr.productInfo.price)),
+                    0
+                  )}
+                </h2>
+                <button className="btn btn-danger w-100 fs-5 fw-medium">
+                 Checkout 
+                </button>
               </div>
-            )
-          )}
+            </div>
+          </div>
         </div>
       </section>
     </>

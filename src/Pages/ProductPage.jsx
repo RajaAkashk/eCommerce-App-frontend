@@ -1,22 +1,32 @@
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import useFetch from "../useFetch";
 import StarRating from "../Components/StarRating";
-import ProductCartPage from "./ProductCartPage";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
+
+import { WishlistContext } from "../Contexts/WishlistContext";
+import { CartContext } from "../Contexts/CartContext";
 
 function ProductPage() {
   const [productsData, setProductsData] = useState([]);
   const [productDataCopy, setProductDataCopy] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
-  const [wishlistData, setWishlistData] = useState([]);
+
   const [isHovered, setIsHovered] = useState(false);
-  const navigate = useNavigate();
+  const [isAdded, setIsAdded] = useState(false);
+
+  const [wishlistData, setWishlistData] = useState([]);
   const [newStore, setNewStore] = useState([]);
   const [cartStoreData, setCartStoreData] = useState([]);
   const [cartStore, setCartStore] = useState([]);
 
+  // contexts
+  const { wishlist, addToWishlist } = useContext(WishlistContext);
+  const { cartList, addProductToCart, deleteProductFromCart } =
+    useContext(CartContext);
+
+  // All Alerts
   const [deleteAlert, setDeleteAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(false);
   const [alertMessageForWishlist, setAlertMessageForWishlist] = useState(false);
@@ -39,46 +49,44 @@ function ProductPage() {
     category !== "All" ? categoryUrl : url
   );
 
-  useEffect(() => {
-    if (data) {
-      console.log("CATEGORY DATA:", data.products);
-      setProductsData(data.products);
-      setProductDataCopy(data.products);
-    }
-  }, [data]);
 
+    useEffect(() => {
+      if (data) {
+        console.log("CATEGORY DATA:", data.products);
+        setProductsData(data.products);
+        setProductDataCopy(data.products);
+      }
+    }, [data]);
+
+  // search Data
+  const location = useLocation();
+  const searchQuery = location.state?.query || "";
+  console.log("Search Query :-", searchQuery);
+
+  // useEffect(() => {
+  //   if (searchQuery) {
+  //     setProductsData(
+  //       productsData.filter((data) => data.name.includes(searchQuery))
+  //     )
+  //   }
+  //   else{
+  //     setProductsData(data.products)
+  //   }
+  // }, [searchQuery, productsData]);
+
+    
   // for checking wishlist data
-  const {
-    data: moreData,
-    loading: moreLoading,
-    error: moreError,
-  } = useFetch(
-    "https://e-commerce-app-backend-seven.vercel.app/wishlist/products"
-  );
-
   useEffect(() => {
-    if (moreData) {
-      console.log("WISHLIST DATA from product PAge:", moreData.products);
-      setWishlistData(moreData.products);
-    }
-  }, [moreData]);
-  if (moreLoading) {
-    console.log("moreLoading..");
-  }
-
-  useEffect(() => {
+    setWishlistData(wishlist);
     if (productsData.length > 0 && wishlistData.length > 0) {
       // Initialize a new array to store matched products
       let matchedProducts = [];
-
-      wishlistData.forEach((wishlistItem) => {
+      wishlistData.map((wishlistItem) => {
         const wishlistProductId = wishlistItem.productInfo?._id;
-
         if (wishlistProductId) {
           const matchingProduct = productsData.find(
             (product) => product._id === wishlistProductId
           );
-
           if (matchingProduct) {
             if (!newStore.includes(wishlistProductId)) {
               matchedProducts.push(wishlistProductId); // Collect all matched product ids
@@ -98,38 +106,26 @@ function ProductPage() {
     }
   }, [productsData, wishlistData]);
 
-  console.log("newStore:::", newStore);
-
-  // Check the Product Cart data is same as product data
-  const {
-    data: cartData,
-    loading: cartLoading,
-    error: cartError,
-  } = useFetch(
-    "https://e-commerce-app-backend-seven.vercel.app/cart/get/products"
-  );
+  console.log("newStore:-", newStore);
 
   useEffect(() => {
-    if (cartData) {
-      console.log("set Cart Store:---", cartData);
-      setCartStoreData(cartData.products);
+    if (cartList) {
+      console.log("set Cart Store:---", cartList);
+      setCartStoreData(cartList);
     }
-  }, [cartData]);
+  }, [cartList]);
   console.log("cartStore:---", cartStoreData);
 
   useEffect(() => {
     if (productsData.length > 0 && cartStoreData.length > 0) {
       // Initialize a new array to store matched products
       let matchedProducts = [];
-
-      cartStoreData.forEach((cartItem) => {
+      cartStoreData.map((cartItem) => {
         const cartProductId = cartItem.productInfo?._id;
-
         if (cartProductId) {
           const matchingProduct = productsData.find(
             (product) => product._id === cartProductId
           );
-
           if (matchingProduct) {
             if (!cartStore.includes(cartProductId)) {
               matchedProducts.push(cartProductId); // Collect all matched product ids
@@ -151,36 +147,11 @@ function ProductPage() {
   console.log("setCartStore:::", cartStore);
 
   //*************** Delete product from cart ***************
-  const DeleteProductFromCart = async (product) => {
-    try {
-      const response = await fetch(
-        `https://e-commerce-app-backend-seven.vercel.app/product/cart/delete/${product._id}`,
-        { method: "DELETE" }
-      );
-      console.log("response", response);
-
-      if (!response.ok) {
-        console.log("Error in response from product cart delete.");
-      }
-
-      const data = await response.json();
-
-      setDeleteAlert(true);
-      setTimeout(() => setDeleteAlert(false), 1000);
-
-      console.log("Deleted from Cart.", data);
-    } catch (error) {
-      console.log("Error in deleting Product from cart.", error);
-    }
+  const deleteProductFromCartHandler = async (product) => {
+    deleteProductFromCart(product);
+    setDeleteAlert(true);
+    setTimeout(() => setDeleteAlert(false), 1000);
   };
-  console.log(
-    "loading:",
-    loading,
-    "moreLoading:",
-    moreLoading,
-    "cartLoading:",
-    cartLoading
-  );
 
   //clear All Filters
   const clearAllFilters = () => {
@@ -192,22 +163,13 @@ function ProductPage() {
   const handleMouseLeave = () => setIsHovered(false);
 
   //Clothing category Handler
-  const [selectedCategories, setSelectedCategories] = useState([]);
-
+  const navigate = useNavigate();
   const categoryHandler = (event) => {
     const { value, checked } = event.target;
     setSelectedCategory(value);
     navigate(`/products/${value}`);
     clearAllFilters(); // so that all filter also back to default.
-
-    setSelectedCategories((prevCategories) =>
-      checked
-        ? [...prevCategories, value]
-        : prevCategories.filter((category) => category !== value)
-    );
   };
-
-  console.log("selectedCategories", selectedCategories);
   console.log("selectedCategory-", selectedCategory);
 
   //Price range Handler
@@ -268,64 +230,32 @@ function ProductPage() {
     );
   }
 
-  // alert message for wishlist
+  // alert message for product already present in wishlist
   const setAlertForWishlist = () => {
     setAlertMessageForWishlist(true);
     setTimeout(() => setAlertMessageForWishlist(false), 1000);
   };
 
+  console.log("wishlist from context now in product page :-", wishlist);
   //****************** adding products to wishlist ******************
-  const addToWishlist = async (product) => {
-    try {
-      const response = await fetch(
-        "https://e-commerce-app-backend-seven.vercel.app/products/wishlist",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(product),
-        }
-      );
-      if (!response.ok) {
-        console.log("Network response is not okay for wishlist.");
-      }
-      const data = await response.json();
-      console.log("Response Data:", data);
-
-      setAlertMessage(true);
-
-      setTimeout(() => {
-        setAlertMessage(false);
-      }, 1000);
-    } catch (error) {
-      console.log("Error adding product to wishlist:", error);
-    }
+  const addToWishlistHandler = async (product) => {
+    console.log("addToWishlistHandler - ", product);
+    console.log("add To Wish list Handler - wishlist from context ", wishlist);
+    addToWishlist(product);
+    setAlertMessage(true);
+    setTimeout(() => {
+      setAlertMessage(false);
+    }, 1000);
+    // CAll the products
   };
 
   //********************* Add Product To Cart *********************
-  const addProductToCart = async (product) => {
-    try {
-      const response = await fetch(
-        "https://e-commerce-app-backend-seven.vercel.app/products/add/cart",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(product),
-        }
-      );
-
-      if (!response.ok) {
-        console.log("Add to Cart response is not okay.");
-      }
-      const data = await response.json();
-
-      setAddCartMesssage(true);
-      setTimeout(() => setAddCartMesssage(false), 1000);
-
-      console.log("Add to cart successfully.", data);
-    } catch (error) {
-      console.log("Error in adding product to cart:", error);
-    }
+  const addProductToCartHandler = async (product) => {
+    addProductToCart(product);
+    setAddCartMesssage(true);
+    setTimeout(() => setAddCartMesssage(false), 1000);
   };
+
 
   //****************** products page ******************
   return (
@@ -517,7 +447,7 @@ function ProductPage() {
                       left: "65%",
                       transform: "translateX(-50%)",
                       zIndex: "9999",
-                      width: "45rem", // Set a smaller width for the alert
+                      width: "45rem",
                       marginTop: "5rem",
                     }}
                     role="alert"
@@ -526,7 +456,7 @@ function ProductPage() {
                       {alertMessage ? (
                         <>Added to Wishlist.</>
                       ) : deleteAlert ? (
-                        <>Deleted from Wishlist.</>
+                        <>Deleted from Cart.</>
                       ) : addCartMesssage ? (
                         <>Added to Cart</>
                       ) : null}
@@ -556,12 +486,9 @@ function ProductPage() {
                             <span className="position-absolute top-0 mt-3 ms-2">
                               <StarRating rating={data.rating} />
                             </span>
+                            {/* add to wishlist heart icon  */}
                             <i
-                              onClick={
-                                !newStore.includes(data._id)
-                                  ? () => addToWishlist(data)
-                                  : () => setAlertForWishlist()
-                              }
+                              onClick={() => addToWishlistHandler(data)}
                               className={`bi ${
                                 newStore.find((prod) => prod == data._id)
                                   ? "bi-heart-fill text-danger"
@@ -569,6 +496,22 @@ function ProductPage() {
                               }  position-absolute top-0 end-0 me-3 mt-2 fs-1`}
                             ></i>
 
+                            {/* <button
+                              onClick={(e) => {
+                                e.target = setIsAdded(!isAdded);
+                                if (!isAdded) {
+                                  addToWishlistHandler(data); // Add to wishlist
+                                }
+                              }}
+                              className="border-0 bg-transparent position-absolute top-0 end-0 me-3 mt-2 fs-1"
+                            >
+                              {isAdded ? (
+                                <i className="bi bi-heart-fill text-danger"></i>
+                              ) : (
+                                <i className="bi bi-heart"></i>
+                              )}
+                            </button> */}
+                            {" "}
                             <Link to={`/productsPage/${data._id}`}>
                               {" "}
                               <img
@@ -589,16 +532,20 @@ function ProductPage() {
                               <p className="card-text py-0 px-3 fs-4 fw-medium">
                                 ₹ {data.price}
                               </p>
+                              {/**************** Add to cart button  ****************/}
                               <button
-                                onClick={() => {
-                                  cartStore.find((item) => item === data._id)
-                                    ? DeleteProductFromCart(data)
-                                    : addProductToCart(data);
+                                onClick={(e) => {
+                                  if (e.target.innerText === "Add to Cart") {
+                                    addProductToCartHandler(data);
+                                    e.target.innerText = "Remove From Cart";
+                                  } else {
+                                    deleteProductFromCartHandler(data);
+                                    e.target.innerText = "Add to Cart";
+                                  }
                                 }}
                                 className="btn btn-danger text-light w-100 fs-5 fw-medium"
                                 style={{ borderRadius: "0px" }}
                               >
-                                {" "}
                                 {cartStore.find((item) => item === data._id)
                                   ? "Remove From Cart"
                                   : "Add to Cart"}
@@ -610,7 +557,7 @@ function ProductPage() {
                     </div>
                   </>
                 ) : (
-                  (loading || moreLoading || cartLoading) && (
+                  loading && (
                     <div
                       className="d-flex justify-content-center align-items-center"
                       style={{ height: "100vh" }}

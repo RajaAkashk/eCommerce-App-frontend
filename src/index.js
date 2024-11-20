@@ -8,6 +8,10 @@ import ProductDetailsPage from "./Pages/ProductDetailsPage";
 import WishlistPage from "./Pages/WishlistPage";
 import ProductCartPage from "./Pages/ProductCartPage";
 
+// contexts
+import { WishlistProvider } from "./Contexts/WishlistContext";
+import { CartProvider } from "./Contexts/CartContext";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -34,7 +38,11 @@ const router = createBrowserRouter([
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <WishlistProvider>
+      <CartProvider>
+      <RouterProvider router={router} />
+      </CartProvider>
+    </WishlistProvider>
   </React.StrictMode>
 );
 
