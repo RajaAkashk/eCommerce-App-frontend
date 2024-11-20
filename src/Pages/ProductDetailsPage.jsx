@@ -129,7 +129,7 @@ function ProductDetailsPage() {
                     >
                       <i class="bi bi-plus"></i>
                     </button>
-                    <span className="mx-2">{quantity}</span>
+                    <span className="mx-2">{productData.quantity}</span>
                     <button
                       className="rounded bg-light"
                       onClick={handleDecrement}

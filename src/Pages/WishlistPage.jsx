@@ -1,85 +1,135 @@
-import { useEffect, useState } from "react";
-import useFetch from "../useFetch";
+import { useState, useContext, useEffect } from "react";
 import Header from "../Components/Header";
 import { Link } from "react-router-dom";
 import StarRating from "../Components/StarRating";
 
+import { WishlistContext } from "../Contexts/WishlistContext";
+import { CartContext } from "../Contexts/CartContext";
+
 const WishlistPage = () => {
-  const [wishlist, setWishList] = useState([]);
+  const [cartStore, setCartStore] = useState([]);
+
+  const { wishlist, removeFromWishlist, loading, error } =
+    useContext(WishlistContext);
+
+  const { cartList, addProductToCart, deleteProductFromCart } =
+    useContext(CartContext);
 
   const [showAlert, setShowAlert] = useState(false);
-
-  const { data, loading, error } = useFetch(
-    `https://e-commerce-app-backend-seven.vercel.app/wishlist/products`
-  );
-
-  useEffect(() => {
-    if (data) {
-      console.log("WishlistPage:-", data.products);
-      setWishList(data.products);
-    }
-  }, [data]);
+  const [addCartMesssage, setAddCartMesssage] = useState(false);
+  const [removeCartMesssage, setRemoveCartMesssage] = useState(false);
 
   if (error) {
     return (
-      <p className="text-center py-5 fs-4 fw-medium text-danger">
-        Error loading wishlist {error.message}
-      </p>
+      <div
+        className="d-flex justify-content-center align-items-center"
+        style={{ height: "100vh" }}
+      >
+        <p className="fs-1 text-danger fw-medium me-2">
+          Opps! Error In Getting Wishlist
+        </p>
+      </div>
     );
   }
 
-  const removeFromWishlist = async (product) => {
-    try {
-      const response = await fetch(
-        `https://e-commerce-app-backend-seven.vercel.app/product/delete/${product._id}`,
-        {
-          method: "DELETE",
-        }
-      );
-      if (response.ok) {
-        console.log("Deleted successfully.");
-        setWishList(
-          wishlist.filter((data) => data.productInfo._id != product._id)
-        );
-        setShowAlert(true);
-        setTimeout(() => {
-          setShowAlert(false);
-        }, 1000);
-      } else {
-        console.log("Failed to delete the item from wishlist.");
-      }
-    } catch (error) {
-      console.log("Error in deleteing data.", error);
-    }
+  console.log("cart list from wish list page : - ", cartList);
+
+  //********************* Remove From Wishlist *********************
+  const handleRemoveFromWishlist = (product) => {
+    removeFromWishlist(product);
+    setShowAlert(true);
+    setTimeout(() => setShowAlert(false), 1000);
   };
+
+  //********************* Add Product To Cart *********************
+  const addProductToCartHandler = async (product) => {
+    addProductToCart(product);
+    setAddCartMesssage(true);
+    setTimeout(() => setAddCartMesssage(false), 1000);
+  };
+
+  const deleteProductFromCartHandler = async (product) => {
+    deleteProductFromCart(product);
+    setRemoveCartMesssage(true);
+    setTimeout(() => setRemoveCartMesssage(false), 1000);
+  };
+
+
+  useEffect(() => {
+    if (wishlist.length > 0 && cartList.length > 0) {
+      let matchedProducts = [];
+      cartList.forEach((cartItem) => {
+        const cartProductId = cartItem.productInfo?._id;
+
+        if (cartProductId) {
+          const matchingProduct = wishlist.find(
+            (product) => product.productInfo._id === cartProductId
+          );
+          if (matchingProduct && !cartStore.includes(cartProductId)) {
+            matchedProducts.push(cartProductId);
+            console.log("Found matching product:", matchingProduct);
+          }
+        }
+      });
+
+      if (matchedProducts.length > 0) {
+        setCartStore((prevCartStore) => {
+          const updatedCartStore = [
+            ...prevCartStore,
+            ...matchedProducts.filter((id) => !prevCartStore.includes(id)),
+          ];
+          console.log(
+            "Updated Cart Store (inside state updater):",
+            updatedCartStore
+          );
+          return updatedCartStore;
+        });
+      }
+    }
+  }, [wishlist, cartList, cartStore]);
+
 
   return (
     <>
-      {/* <Header wishlist={wishlist}/> */}
       <Header />
       <section className="py-5">
         <div className="container">
           <div className="row">
-            {showAlert && (
-              <div className="alert alert-success text-center" role="alert">
-                <span className="fs-5 fw-medium">SuccessFully Deleted</span>
+            {/*********************** alerts  ***********************/}
+            {(showAlert || addCartMesssage || removeCartMesssage) && (
+              <div
+                className="absolute top-20 alert alert-success text-center"
+                role="alert"
+              >
+                <span className="fs-5 fw-medium">
+                  {showAlert ? (
+                    <>Remove from Wishlist.</>
+                  ) : addCartMesssage ? (
+                    <>Added to Cart</>
+                  ) : removeCartMesssage ? (
+                    <>Removed From Cart</>
+                  ) : null}
+                </span>
               </div>
             )}
-            {data
-              ? wishlist?.map((data) => (
+
+            {wishlist.length > 0
+              ? wishlist.map((data) => (
                   <div key={data.productInfo._id} className="col-md-3">
                     <div
                       className="card position-relative mb-4"
                       style={{ borderRadius: "0px" }}
                     >
                       {data.productInfo?.rating && (
-                      <span className="position-absolute top-0 mt-3 ms-2">
-                        <StarRating rating={data.productInfo.rating} />
-                      </span>
-                    )}
-                      {/************ add to wishlist btn  ************/}
+                        <span className="position-absolute top-0 mt-3 ms-2">
+                          <StarRating rating={data.productInfo.rating} />
+                        </span>
+                      )}
+                      {/************ Remove from wishlist btn  ************/}
                       <i
-                        onClick={() => removeFromWishlist(data.productInfo)}
+                        onClick={() =>
+                          handleRemoveFromWishlist(data.productInfo)
+                        }
                         className="bi bi-heart-fill text-danger position-absolute top-0 end-0 me-3 mt-2 fs-1"
                       ></i>
 
@@ -102,13 +152,24 @@ const WishlistPage = () => {
                         <p className="card-text py-0 px-3 fs-4 fw-medium">
                           ₹ {data.productInfo.price}
                         </p>
-                        <Link
-                          to="#"
+
+                        <button
+                          onClick={(e) => {
+                            if (e.target.innerText === "Add to Cart") {
+                              addProductToCartHandler(data.productInfo);
+                              e.target.innerText = "Remove From Cart";
+                            } else {
+                              deleteProductFromCartHandler(data.productInfo);
+                              e.target.innerText = "Add to Cart";
+                            }
+                          }}
                           className="btn btn-danger text-light w-100 fs-5 fw-medium"
                           style={{ borderRadius: "0px" }}
                         >
-                          Add to Cart
-                        </Link>
+                          {cartStore.find((item) => item === data.productInfo._id)
+                            ? "Remove From Cart"
+                            : "Add to Cart"}
+                        </button>
                       </div>
                     </div>
                   </div>
