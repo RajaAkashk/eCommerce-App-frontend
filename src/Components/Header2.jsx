@@ -38,7 +38,7 @@ function Header() {
             >
               {/************ Search ************/}
               <div className="col-md-5">
-                {/* <div className="input-group border rounded">
+                <div className="input-group border rounded">
                   <span className="input-group-text bg-white border-0">
                     <i className="bi bi-search"></i>
                   </span>
@@ -53,7 +53,7 @@ function Header() {
                     placeholder="Search"
                     aria-label="Search"
                   />
-                </div> */}
+                </div>
               </div>
 
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0">

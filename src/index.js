@@ -7,7 +7,8 @@ import ProductPage from "./Pages/ProductPage";
 import ProductDetailsPage from "./Pages/ProductDetailsPage";
 import WishlistPage from "./Pages/WishlistPage";
 import ProductCartPage from "./Pages/ProductCartPage";
-
+import CheckoutPage from "./Pages/CheckoutPage";
+import UserPage from "./Pages/UserPage";
 // contexts
 import { WishlistProvider } from "./Contexts/WishlistContext";
 import { CartProvider } from "./Contexts/CartContext";
@@ -33,6 +34,14 @@ const router = createBrowserRouter([
     path: "/cartPage",
     element: <ProductCartPage />,
   },
+  {
+    path: "/checkoutPage",
+    element: <CheckoutPage />,
+  },
+  {
+    path: "/userPage",
+    element: <UserPage />,
+  },
 ]);
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
@@ -40,7 +49,7 @@ root.render(
   <React.StrictMode>
     <WishlistProvider>
       <CartProvider>
-      <RouterProvider router={router} />
+        <RouterProvider router={router} />
       </CartProvider>
     </WishlistProvider>
   </React.StrictMode>

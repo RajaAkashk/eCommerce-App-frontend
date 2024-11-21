@@ -1,4 +1,4 @@
-import Header from "../Components/Header";
+import Header2 from "../Components/Header2";
 import Footer from "../Components/Footer";
 import { useState, useEffect, useContext } from "react";
 import useFetch from "../useFetch";
@@ -49,14 +49,13 @@ function ProductPage() {
     category !== "All" ? categoryUrl : url
   );
 
-
-    useEffect(() => {
-      if (data) {
-        console.log("CATEGORY DATA:", data.products);
-        setProductsData(data.products);
-        setProductDataCopy(data.products);
-      }
-    }, [data]);
+  useEffect(() => {
+    if (data) {
+      console.log("CATEGORY DATA:", data.products);
+      setProductsData(data.products);
+      setProductDataCopy(data.products);
+    }
+  }, [data]);
 
   // search Data
   const location = useLocation();
@@ -74,7 +73,6 @@ function ProductPage() {
   //   }
   // }, [searchQuery, productsData]);
 
-    
   // for checking wishlist data
   useEffect(() => {
     setWishlistData(wishlist);
@@ -256,12 +254,11 @@ function ProductPage() {
     setTimeout(() => setAddCartMesssage(false), 1000);
   };
 
-
   //****************** products page ******************
   return (
     <>
       {/* <Header wishlist={wishlistData} /> */}
-      <Header />
+      <Header2 />
       <section>
         <div className="container-fluid">
           <div className="row">
@@ -488,14 +485,17 @@ function ProductPage() {
                             </span>
                             {/* add to wishlist heart icon  */}
                             <i
-                              onClick={() => addToWishlistHandler(data)}
+                              onClick={
+                                !newStore.includes(data._id)
+                                  ? () => addToWishlistHandler(data)
+                                  : () => setAlertForWishlist()
+                              }
                               className={`bi ${
                                 newStore.find((prod) => prod == data._id)
                                   ? "bi-heart-fill text-danger"
                                   : "bi-heart"
-                              }  position-absolute top-0 end-0 me-3 mt-2 fs-1`}
+                              } position-absolute top-0 end-0 me-3 mt-2 fs-1`}
                             ></i>
-
                             {/* <button
                               onClick={(e) => {
                                 e.target = setIsAdded(!isAdded);
@@ -510,8 +510,7 @@ function ProductPage() {
                               ) : (
                                 <i className="bi bi-heart"></i>
                               )}
-                            </button> */}
-                            {" "}
+                            </button> */}{" "}
                             <Link to={`/productsPage/${data._id}`}>
                               {" "}
                               <img
@@ -557,7 +556,7 @@ function ProductPage() {
                     </div>
                   </>
                 ) : (
-                  loading && (
+                  !loading && (
                     <div
                       className="d-flex justify-content-center align-items-center"
                       style={{ height: "100vh" }}
