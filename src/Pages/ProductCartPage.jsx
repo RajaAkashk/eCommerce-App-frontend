@@ -282,9 +282,9 @@ const ProductCartPage = () => {
                     0
                   )}
                 </h2>
-                <button className="btn btn-danger w-100 fs-5 fw-medium">
-                 Checkout 
-                </button>
+                <Link to="/checkoutPage" className="btn btn-danger w-100 fs-5 fw-medium">
+                 Buy Now  
+                </Link>
               </div>
             </div>
           </div>

@@ -2,24 +2,29 @@ import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import { useParams } from "react-router-dom";
 import useFetch from "../useFetch";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
 import { Link } from "react-router-dom";
+import { productContext } from "../Contexts/ProductsContext";
 
 function ProductDetailsPage() {
   const [productData, setProductData] = useState({});
   const [quantity, setQuantity] = useState(1);
   const [moreProducts, setMoreProducts] = useState();
 
+  // contexts
+  const { updateProduct } = useContext(productContext);
+
   const dataId = useParams();
   console.log("DATA ID:-", dataId.productId);
   const selectedProductId = dataId.productId;
+
   //********* get Selected data  *********
   const { data, loading, error } = useFetch(
     `https://e-commerce-app-backend-seven.vercel.app/products/${selectedProductId}`
   );
   useEffect(() => {
     if (data) {
-      console.log("selected ProductId Data:--", data.products);
+      console.log("selected ProductId Data from Product Details PAge:--", data.products);
       setProductData(data.products);
     }
   }, [data]);
@@ -40,12 +45,14 @@ function ProductDetailsPage() {
       setMoreProducts(moreProductsData.products);
     }
   }, [moreProductsData]);
-  
+
   console.log("moreProducts:-", moreProducts);
 
-  const handleIncrement = () => {
+  
+  const handleIncrement = (product) => {
     if (quantity < 20) {
       setQuantity((prevQuantity) => prevQuantity + 1);
+      updateProduct(product)
     }
   };
   const handleDecrement = () => {
@@ -116,16 +123,13 @@ function ProductDetailsPage() {
                     <i class="bi bi-star-fill text-warning"></i> (
                     {productData.rating})
                   </div>
-                  <h2 className="pt-4 text-danger">
-                    ₹{" "}
-                    {productData.price}
-                  </h2>
+                  <h2 className="pt-4 text-danger">₹ {productData.price}</h2>
 
                   <div className="pt-3 pb-2">
                     <span className="fs-5 fw-medium me-2">Quantity: </span>
                     <button
                       className="rounded bg-light"
-                      onClick={handleIncrement}
+                      onClick={() => handleIncrement(productData)}
                     >
                       <i class="bi bi-plus"></i>
                     </button>
