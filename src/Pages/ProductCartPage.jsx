@@ -176,17 +176,17 @@ const ProductCartPage = () => {
                           <div className="col-md-8 position-relative">
                             <div className="card-body">
                               {/* Product Name and Quantity */}
-                              <h5 className="card-title display-6 fw-medium my-2">
+                              <h5 className="card-title fw-medium my-2" style={{fontSize:"2.2rem"}}>
                                 {data.productInfo.name}
                                 {/* <span>({data.productInfo.quantity})</span> */}
                               </h5>
 
                               {/* Star Rating */}
-                              <p className="mb-0 my-2">
+                              <p className="mb-0 mt-3">
                                 <StarRating rating={data.productInfo.rating} />
                               </p>
 
-                              <div className="pt-2 pb-2">
+                              <div className="py-3">
                                 <span className="fs-5 fw-medium me-2">
                                   Quantity:{" "}
                                 </span>
@@ -265,7 +265,7 @@ const ProductCartPage = () => {
             </div>
             <div className="col-md-5">
               <div className="border rounded text-center p-5">
-                <h1>
+                <h1 style={{fontSize:"2.3rem"}}>
                   Total Product (
                   {cartList.reduce(
                     (acc, curr) =>
@@ -274,7 +274,7 @@ const ProductCartPage = () => {
                   )}
                   )
                 </h1>
-                <h2 className="my-3 mb-4">
+                <h2 className="my-3 mb-4" style={{fontSize:"1.7rem"}}>
                   Total Price: ₹{" "}
                   {cartList.reduce(
                     (acc, curr) =>
@@ -283,7 +283,7 @@ const ProductCartPage = () => {
                   )}
                 </h2>
                 <Link to="/checkoutPage" className="btn btn-danger w-100 fs-5 fw-medium">
-                 Buy Now  
+                 Buy Now
                 </Link>
               </div>
             </div>

@@ -12,6 +12,7 @@ import UserPage from "./Pages/UserPage";
 // contexts
 import { WishlistProvider } from "./Contexts/WishlistContext";
 import { CartProvider } from "./Contexts/CartContext";
+import { AddressContextProvider } from "./Contexts/AddressContext";
 
 const router = createBrowserRouter([
   {
@@ -49,7 +50,9 @@ root.render(
   <React.StrictMode>
     <WishlistProvider>
       <CartProvider>
-        <RouterProvider router={router} />
+        <AddressContextProvider>
+          <RouterProvider router={router} />
+        </AddressContextProvider>
       </CartProvider>
     </WishlistProvider>
   </React.StrictMode>
