@@ -13,6 +13,7 @@ import UserPage from "./Pages/UserPage";
 import { WishlistProvider } from "./Contexts/WishlistContext";
 import { CartProvider } from "./Contexts/CartContext";
 import { AddressContextProvider } from "./Contexts/AddressContext";
+import { ProductProvider } from "./Contexts/ProductsContext";
 
 const router = createBrowserRouter([
   {
@@ -51,7 +52,9 @@ root.render(
     <WishlistProvider>
       <CartProvider>
         <AddressContextProvider>
-          <RouterProvider router={router} />
+          <ProductProvider>
+            <RouterProvider router={router} />
+          </ProductProvider>
         </AddressContextProvider>
       </CartProvider>
     </WishlistProvider>

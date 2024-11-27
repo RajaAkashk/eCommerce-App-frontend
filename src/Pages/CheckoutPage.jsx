@@ -8,14 +8,7 @@ import { CartContext } from "../Contexts/CartContext";
 function CheckoutPage() {
   const [message, setMessage] = useState(false);
 
-  const {
-    address,
-    userInfo,
-    updateUserAddress,
-    getAllAddress,
-    loading,
-    error,
-  } = useContext(AddressContext);
+  const { userInfo } = useContext(AddressContext);
 
   const { cartList } = useContext(CartContext);
 

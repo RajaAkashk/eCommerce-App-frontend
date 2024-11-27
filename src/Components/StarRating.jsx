@@ -1,19 +1,4 @@
 import React from "react";
-// import ReactStars from 'react-rating-stars-component';
-
-// const StarRating = ({ rating }) => {
-//   return (
-//     <ReactStars
-//     count={5} // Total stars
-//     value={rating}
-//     size={30} // Star size
-//     activeColor="#FFD700" // Color of filled stars
-//     edit={false} // Make it read-only
-//   />
-//   );
-// };
-
-// export default StarRating;
 
 const StarRating = ({ rating }) => {
   return (

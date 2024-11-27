@@ -3,16 +3,16 @@ import { useState, useContext } from "react";
 import { WishlistContext } from "../Contexts/WishlistContext";
 import { CartContext } from "../Contexts/CartContext";
 
-function Header() {
+function Header({ onSearch }) {
   const { wishlist } = useContext(WishlistContext);
   const { cartList } = useContext(CartContext);
-  const [searchQuery, setSearchQuery] = useState("");
-  const navigate = useNavigate();
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const searchHandler = () => {
-    navigate("/products/All", { state: { query: searchQuery } });
+
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value);
+    onSearch(e.target.value); // Pass search term to parent
   };
-
   return (
     <>
       <header>
@@ -44,9 +44,8 @@ function Header() {
                   </span>
 
                   <input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onClick={searchHandler} // Or use a button to trigger the search
+                    value={searchTerm}
+                    onChange={handleSearch}
                     style={{ outline: "none", boxShadow: "none" }}
                     className="form-control border-0"
                     type="text"
@@ -61,7 +60,7 @@ function Header() {
                   <Link className="nav-link" aria-current="page" to="/userPage">
                     <button className="btn btn-danger fw-medium text-light">
                       <i class="bi bi-person-fill-check text-white me-1"></i>
-                      User 
+                      User
                     </button>
                   </Link>
                 </li>
