@@ -57,21 +57,17 @@ function ProductPage() {
     }
   }, [data]);
 
-  // search Data
-  const location = useLocation();
-  const searchQuery = location.state?.query || "";
-  console.log("Search Query :-", searchQuery);
-
-  // useEffect(() => {
-  //   if (searchQuery) {
-  //     setProductsData(
-  //       productsData.filter((data) => data.name.includes(searchQuery))
-  //     )
-  //   }
-  //   else{
-  //     setProductsData(data.products)
-  //   }
-  // }, [searchQuery, productsData]);
+  // Handle search term and filter products
+  const handleSearch = (searchTerm) => {
+    if (searchTerm === "") {
+      setProductsData(productsData); // Show all products if search is cleared
+    } else {
+      const filtered = productDataCopy.filter((product) =>
+        product.name.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+      setProductsData(filtered);
+    }
+  };
 
   // for checking wishlist data
   useEffect(() => {
@@ -258,7 +254,7 @@ function ProductPage() {
   return (
     <>
       {/* <Header wishlist={wishlistData} /> */}
-      <Header2 />
+      <Header2 onSearch={handleSearch} />
       <section>
         <div className="container-fluid">
           <div className="row">

@@ -16,7 +16,7 @@ const ProductCartPage = () => {
   const [deleteAlert, setDeleteAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessageForWishlist, setAlertMessageForWishlist] = useState(false);
+
   const [wishlistData, setWishlistData] = useState([]);
   const [newStore, setNewStore] = useState([]);
   const [quantity, setQuantity] = useState(1);
@@ -103,12 +103,6 @@ const ProductCartPage = () => {
     }, 1000);
   };
 
-  // alert message for wishlist
-  const setAlertForWishlist = () => {
-    setAlertMessageForWishlist(true);
-    setTimeout(() => setAlertMessageForWishlist(false), 1000);
-  };
-
   const handleIncrement = () => {
     if (quantity < 10) {
       setQuantity((prevQuantity) => prevQuantity + 1);
@@ -119,6 +113,18 @@ const ProductCartPage = () => {
       setQuantity((prevQuantity) => prevQuantity - 1);
     }
   };
+
+  // total price
+  const totalProducts = cartList.reduce(
+    (acc, curr) => (acc = acc + parseInt(curr.productInfo.quantity)),
+    0
+  );
+
+  const totalPrice =  cartList.reduce(
+    (acc, curr) => acc + (parseInt(curr.productInfo.quantity) * parseInt(curr.productInfo.price)),
+    0
+  );
+
 
   return (
     <>
@@ -141,12 +147,6 @@ const ProductCartPage = () => {
               <span className="fs-5 fw-medium">Item removed from cart</span>
             </div>
           )}
-          {alertMessageForWishlist && (
-            <div className="alert alert-success text-center" role="alert">
-              <span className="fs-5 fw-medium">Product Added To Wishlist</span>
-            </div>
-          )}
-
           <div className="row px-5">
             <div className="col-md-7">
               {/******************** Display Cart Data ********************/}
@@ -176,7 +176,10 @@ const ProductCartPage = () => {
                           <div className="col-md-8 position-relative">
                             <div className="card-body">
                               {/* Product Name and Quantity */}
-                              <h5 className="card-title fw-medium my-2" style={{fontSize:"2.2rem"}}>
+                              <h5
+                                className="card-title fw-medium my-2"
+                                style={{ fontSize: "2.2rem" }}
+                              >
                                 {data.productInfo.name}
                                 {/* <span>({data.productInfo.quantity})</span> */}
                               </h5>
@@ -188,23 +191,25 @@ const ProductCartPage = () => {
 
                               <div className="py-3">
                                 <span className="fs-5 fw-medium me-2">
-                                  Quantity:{" "}
+                                  Quantity ({" "}
+                                  <span className="fs-5 fw-medium">
+                                    {data.productInfo.quantity}{" "}
+                                  </span>
+                                  )
                                 </span>
-                                <button
+                                {/* <button
                                   className="rounded bg-light"
                                   onClick={handleIncrement}
                                 >
                                   <i class="bi bi-plus"></i>
-                                </button>
-                                <span className="mx-2">
-                                  {data.productInfo.quantity}
-                                </span>
-                                <button
+                                </button> */}
+
+                                {/* <button
                                   className="rounded bg-light"
                                   onClick={handleDecrement}
                                 >
                                   <i class="bi bi-dash"></i>
-                                </button>
+                                </button> */}
                               </div>
 
                               {/* Price */}
@@ -213,9 +218,11 @@ const ProductCartPage = () => {
                               </p>
 
                               {/************* Wishlist button *************/}
-                              <button                           
+                              <button
                                 onClick={(e) => {
-                                  if (e.target.innerText === "Add To Wishlist") {
+                                  if (
+                                    e.target.innerText === "Add To Wishlist"
+                                  ) {
                                     addToWishlistHandler(data);
                                     e.target.innerText = "Remove From Wishlist";
                                   } else {
@@ -265,25 +272,17 @@ const ProductCartPage = () => {
             </div>
             <div className="col-md-5">
               <div className="border rounded text-center p-5">
-                <h1 style={{fontSize:"2.3rem"}}>
-                  Total Product (
-                  {cartList.reduce(
-                    (acc, curr) =>
-                      (acc = acc + parseInt(curr.productInfo.quantity)),
-                    0
-                  )}
-                  )
+                <h1 style={{ fontSize: "2.3rem" }}>
+                  Total Product ({totalProducts})
                 </h1>
-                <h2 className="my-3 mb-4" style={{fontSize:"1.7rem"}}>
-                  Total Price: ₹{" "}
-                  {cartList.reduce(
-                    (acc, curr) =>
-                      (acc = acc + parseInt(curr.productInfo.price)),
-                    0
-                  )}
+                <h2 className="my-3 mb-4" style={{ fontSize: "1.7rem" }}>
+                  Total Price: ₹ {totalPrice}
                 </h2>
-                <Link to="/checkoutPage" className="btn btn-danger w-100 fs-5 fw-medium">
-                 Buy Now
+                <Link
+                  to="/checkoutPage"
+                  className="btn btn-danger w-100 fs-5 fw-medium"
+                >
+                  Buy Now
                 </Link>
               </div>
             </div>

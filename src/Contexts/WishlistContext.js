@@ -20,7 +20,6 @@ const WishlistProvider = ({ children }) => {
 
   // Add to wishlist function
   const addToWishlist = async (product) => {
-
     try {
       const response = await fetch(
         "https://e-commerce-app-backend-seven.vercel.app/products/wishlist",
@@ -35,12 +34,18 @@ const WishlistProvider = ({ children }) => {
         return;
       }
       const data = await response.json();
+      console.log("Product added to wishlist:", data);
+
+      // Directly update the wishlist state with the newly added product
+      setWishList((prevWishlist) => [...prevWishlist, product]);
+      
       // Re-fetch the wishlist from MongoDB after adding a new item
-      const updatedWishlist = await fetch(
-        "https://e-commerce-app-backend-seven.vercel.app/wishlist/products"
-      );
-      const updatedData = await updatedWishlist.json();
-      setWishList(updatedData.products); // Update the state with the latest data from the backend
+      // const updatedWishlist = await fetch(
+      //   "https://e-commerce-app-backend-seven.vercel.app/wishlist/products"
+      // );
+      // const updatedData = await updatedWishlist.json();
+      // setWishList(updatedData.products);
+      // Update the state with the latest data from the backend
     } catch (error) {
       console.log("Error adding product to wishlist:", error);
     }
