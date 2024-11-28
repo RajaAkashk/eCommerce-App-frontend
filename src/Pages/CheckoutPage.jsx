@@ -26,7 +26,7 @@ function CheckoutPage() {
     <>
       <Header />
       <main className="d-flex justify-content-center p-5">
-        <div className="border p-4 rounded border-2" style={{ width: "50%" }}>
+        <div className="border p-4 rounded border-2" style={{ width: "50vw" }}>
           {/* Show confirmation message or order summary */}
           {message ? (
             <div className="text-center">

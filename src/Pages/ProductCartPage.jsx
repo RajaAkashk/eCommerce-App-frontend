@@ -5,21 +5,33 @@ import StarRating from "../Components/StarRating";
 import { Link } from "react-router-dom";
 import { CartContext } from "../Contexts/CartContext";
 import { WishlistContext } from "../Contexts/WishlistContext";
+import { ProductContext } from "../Contexts/ProductsContext";
 
 const ProductCartPage = () => {
-  const { cartList, deleteProductFromCart, loading, error } =
-    useContext(CartContext);
+  const {
+    cartList,
+    deleteProductFromCart,
+    loading,
+    error,
+    updatedTheFetchData,
+  } = useContext(CartContext);
 
   const { wishlist, addToWishlist, removeFromWishlist } =
     useContext(WishlistContext);
 
+  const { updateProduct } = useContext(ProductContext);
+
+  // Alerts
   const [deleteAlert, setDeleteAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [alertForQuantityIncrease, setAlertForQuantityIncrease] =
+    useState(false);
+  const [alertForQuantityDecrease, setAlertForQuantityDecrease] =
+    useState(false);
 
-  const [wishlistData, setWishlistData] = useState([]);
+  const [cartListData, setCartListData] = useState([]);
   const [newStore, setNewStore] = useState([]);
-  const [quantity, setQuantity] = useState(1);
 
   //******************** Error Handling ********************
   if (error) {
@@ -37,25 +49,24 @@ const ProductCartPage = () => {
     setTimeout(() => setDeleteAlert(false), 1000);
   };
 
+  useEffect(() => {
+    if (cartList) {
+      setCartListData(cartList);
+      console.log("setCartListData :-", cartList);
+    }
+  }, [cartList]);
+
   // To check the cart product and wishlist product are same wishlist
 
-  // for getting wishlist data
-  useEffect(() => {
-    if (wishlist) {
-      setWishlistData(wishlist);
-    }
-  }, [wishlist]);
-
-  console.log("WISHLIST DATA FROM CART :", wishlistData);
-  console.log("cartList", cartList);
+  console.log("WISHLIST DATA FROM CART :", wishlist);
+  console.log("cartList DATA FROM CART :", cartList);
 
   // Matching cart data with wishlist data.
   useEffect(() => {
-    if (cartList.length > 0 && wishlistData.length > 0) {
-      // Initialize a new array to store matched products
+    if (cartList.length > 0 && wishlist.length > 0) {
       let matchedProducts = [];
 
-      wishlistData.forEach((wishlistItem) => {
+      wishlist.forEach((wishlistItem) => {
         const wishlistProductId = wishlistItem.productInfo?._id;
         if (wishlistProductId) {
           const matchingProduct = cartList.find(
@@ -80,7 +91,7 @@ const ProductCartPage = () => {
         setNewStore(matchedProducts);
       }
     }
-  }, [cartList, wishlistData]);
+  }, [cartList, wishlist]);
 
   console.log("NEW STORE:::::", newStore);
 
@@ -103,28 +114,77 @@ const ProductCartPage = () => {
     }, 1000);
   };
 
-  const handleIncrement = () => {
-    if (quantity < 10) {
-      setQuantity((prevQuantity) => prevQuantity + 1);
-    }
-  };
-  const handleDecrement = () => {
-    if (quantity > 1) {
-      setQuantity((prevQuantity) => prevQuantity - 1);
-    }
-  };
-
-  // total price
-  const totalProducts = cartList.reduce(
+  // total number of products
+  const totalProducts = cartListData.reduce(
     (acc, curr) => (acc = acc + parseInt(curr.productInfo.quantity)),
     0
   );
-
-  const totalPrice =  cartList.reduce(
-    (acc, curr) => acc + (parseInt(curr.productInfo.quantity) * parseInt(curr.productInfo.price)),
+  // total price of products
+  const totalPrice = cartListData.reduce(
+    (acc, curr) =>
+      acc +
+      parseInt(curr.productInfo.quantity) * parseInt(curr.productInfo.price),
     0
   );
 
+  // Update product quantity
+
+  const handleIncrement = async (product) => {
+    if (product.quantity < 20) {
+      const updatedProduct = { ...product, quantity: product.quantity + 1 };
+
+      // Await backend response to update the product
+      const updatedBackendProduct = await updateProduct(updatedProduct);
+      // Returns updated product from backend
+      console.log("updatedBackendProduct :-", updatedBackendProduct);
+
+      if (updatedBackendProduct) {
+        // Update cartListData with the updated productInfo
+        setCartListData((prevCartList) =>
+          prevCartList.map((item) =>
+            item.productInfo._id === updatedBackendProduct.products._id
+              ? { ...item, productInfo: updatedBackendProduct.products } // Update productInfo directly from backend response
+              : item
+          )
+        );
+        setAlertForQuantityIncrease(true);
+        setTimeout(() => {
+          setAlertForQuantityIncrease(false);
+        }, 1000);
+      } else {
+        console.error("Failed to update product in the backend.");
+      }
+    }
+  };
+
+  const handleDecrement = async (product) => {
+    if (product.quantity > 1) {
+      const updatedProduct = { ...product, quantity: product.quantity - 1 };
+
+      const updatedBackendProduct = await updateProduct(updatedProduct);
+      if (updatedBackendProduct) {
+        setCartListData((prevCartList) =>
+          prevCartList.map((item) =>
+            item.productInfo._id === updatedBackendProduct.products._id
+              ? { ...item, productInfo: updatedBackendProduct.products }
+              : item
+          )
+        );
+        setAlertForQuantityDecrease(true);
+        setTimeout(() => {
+          setAlertForQuantityDecrease(false);
+        }, 1000);
+      }
+    }
+  };
+
+  // const cartListNew = () => {
+  //   wishlist;
+  // };
+
+  useEffect(() => {
+    updatedTheFetchData();
+  }, [updatedTheFetchData]);
 
   return (
     <>
@@ -132,27 +192,36 @@ const ProductCartPage = () => {
       <section className="py-5">
         <div className="container">
           {/***************** Alerts *****************/}
-          {alertMessage && (
-            <div className="alert alert-success text-center" role="alert">
-              <span className="fs-5 fw-medium">Added to Wishlist.</span>
+          {(alertMessage ||
+            showAlert ||
+            deleteAlert ||
+            alertForQuantityIncrease ||
+            alertForQuantityDecrease) && (
+            <div
+              className="alert alert-success text-center position-fixed top-1"
+              role="alert"
+              style={{ width: "80%", zIndex: "9999" }}
+            >
+              <span className="fs-5 fw-medium">
+                {alertMessage
+                  ? "Added to Wishlist."
+                  : showAlert
+                  ? "Removed from Wishlist."
+                  : alertForQuantityDecrease
+                  ? "One Item Removed"
+                  : alertForQuantityIncrease
+                  ? "One Item Added"
+                  : "Item removed from cart."}
+              </span>
             </div>
           )}
-          {showAlert && (
-            <div className="alert alert-success text-center" role="alert">
-              <span className="fs-5 fw-medium">Remove from Wishlist.</span>
-            </div>
-          )}
-          {deleteAlert && (
-            <div className="alert alert-success text-center" role="alert">
-              <span className="fs-5 fw-medium">Item removed from cart</span>
-            </div>
-          )}
+
           <div className="row px-5">
             <div className="col-md-7">
               {/******************** Display Cart Data ********************/}
-              {cartList.length != 0 ? (
+              {cartListData.length != 0 ? (
                 <div className="row">
-                  {cartList?.map((data) => (
+                  {cartListData?.map((data) => (
                     <div key={data._id} className="col-md-12">
                       <div className="card mb-3">
                         <div className="row g-0">
@@ -175,13 +244,12 @@ const ProductCartPage = () => {
                           {/* Card Body Column */}
                           <div className="col-md-8 position-relative">
                             <div className="card-body">
-                              {/* Product Name and Quantity */}
+                              {/* Product Name */}
                               <h5
                                 className="card-title fw-medium my-2"
                                 style={{ fontSize: "2.2rem" }}
                               >
                                 {data.productInfo.name}
-                                {/* <span>({data.productInfo.quantity})</span> */}
                               </h5>
 
                               {/* Star Rating */}
@@ -189,32 +257,46 @@ const ProductCartPage = () => {
                                 <StarRating rating={data.productInfo.rating} />
                               </p>
 
-                              <div className="py-3">
-                                <span className="fs-5 fw-medium me-2">
-                                  Quantity ({" "}
-                                  <span className="fs-5 fw-medium">
-                                    {data.productInfo.quantity}{" "}
+                              <div className="pt-3 pb-2">
+                                {/* Quantity of products*/}
+                                <div className="">
+                                  <span className="fs-5 fw-medium me-2">
+                                    Quantity:{" "}
                                   </span>
-                                  )
-                                </span>
-                                {/* <button
-                                  className="rounded bg-light"
-                                  onClick={handleIncrement}
-                                >
-                                  <i class="bi bi-plus"></i>
-                                </button> */}
-
-                                {/* <button
-                                  className="rounded bg-light"
-                                  onClick={handleDecrement}
-                                >
-                                  <i class="bi bi-dash"></i>
-                                </button> */}
+                                  <button
+                                    className="rounded bg-light"
+                                    onClick={() =>
+                                      handleIncrement(data.productInfo)
+                                    }
+                                  >
+                                    <i className="bi bi-plus"></i>
+                                  </button>
+                                  <span className="mx-2">
+                                    {data.productInfo.quantity}
+                                  </span>
+                                  <button
+                                    className="rounded bg-light"
+                                    onClick={() =>
+                                      handleDecrement(data.productInfo)
+                                    }
+                                  >
+                                    <i className="bi bi-dash"></i>
+                                  </button>
+                                </div>
                               </div>
 
+                              {/* product size  */}
+                              <div className="py-1 pb-2">
+                                <span className="fs-5 fw-medium me-2">
+                                  Size:
+                                </span>
+                                <span className="bg-light fw-medium fs-5">
+                                  {data.productInfo.selectedSize}
+                                </span>
+                              </div>
                               {/* Price */}
                               <p className="card-text fs-5 fw-medium">
-                                ₹ {data.productInfo.price}
+                                Price: ₹ {data.productInfo.price}
                               </p>
 
                               {/************* Wishlist button *************/}

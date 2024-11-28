@@ -8,7 +8,7 @@ import { CartContext } from "../Contexts/CartContext";
 
 const WishlistPage = () => {
   const [cartStore, setCartStore] = useState([]);
-
+  const [wishlistData, setWishlistData] = useState([]);
   const { wishlist, removeFromWishlist, loading, error } =
     useContext(WishlistContext);
 
@@ -18,6 +18,12 @@ const WishlistPage = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [addCartMesssage, setAddCartMesssage] = useState(false);
   const [removeCartMesssage, setRemoveCartMesssage] = useState(false);
+
+  // useEffect(() => {
+  //   if (wishlist) {
+  //     setWishlistData(wishlist);
+  //   }
+  // }, wishlist);
 
   if (error) {
     return (
@@ -32,7 +38,8 @@ const WishlistPage = () => {
     );
   }
 
-  console.log("cart list from wish list page : - ", cartList);
+  console.log("cart list from wishlist page : - ", cartList);
+  console.log("wish list from wishlist page : - ", wishlist);
 
   //********************* Remove From Wishlist *********************
   const handleRemoveFromWishlist = (product) => {
@@ -53,7 +60,6 @@ const WishlistPage = () => {
     setRemoveCartMesssage(true);
     setTimeout(() => setRemoveCartMesssage(false), 1000);
   };
-
 
   useEffect(() => {
     if (wishlist.length > 0 && cartList.length > 0) {
@@ -87,7 +93,6 @@ const WishlistPage = () => {
       }
     }
   }, [wishlist, cartList, cartStore]);
-
 
   return (
     <>
@@ -166,7 +171,9 @@ const WishlistPage = () => {
                           className="btn btn-danger text-light w-100 fs-5 fw-medium"
                           style={{ borderRadius: "0px" }}
                         >
-                          {cartStore.find((item) => item === data.productInfo._id)
+                          {cartStore.find(
+                            (item) => item === data.productInfo._id
+                          )
                             ? "Remove From Cart"
                             : "Add to Cart"}
                         </button>
