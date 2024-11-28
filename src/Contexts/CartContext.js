@@ -37,15 +37,19 @@ const CartProvider = ({ children }) => {
       const data = await response.json();
       console.log("Add to cart successfully.", data);
 
-      // Re-fetch the cart from MongoDB after adding a new item
-      const updatedCart = await fetch(
-        "https://e-commerce-app-backend-seven.vercel.app/cart/get/products"
-      );
-      const updatedData = await updatedCart.json();
-      setCartList(updatedData.products);
+      updatedTheFetchData();
     } catch (error) {
       console.log("Error in adding product to cart:", error);
     }
+  };
+
+  const updatedTheFetchData = async () => {
+    // Re-fetch the cart from MongoDB after adding a new item
+    const updatedCart = await fetch(
+      "https://e-commerce-app-backend-seven.vercel.app/cart/get/products"
+    );
+    const updatedData = await updatedCart.json();
+    setCartList(updatedData.products);
   };
 
   //*************** Delete product from cart ***************
@@ -86,6 +90,7 @@ const CartProvider = ({ children }) => {
         deleteProductFromCart,
         loading,
         error,
+        updatedTheFetchData,
       }}
     >
       {children}

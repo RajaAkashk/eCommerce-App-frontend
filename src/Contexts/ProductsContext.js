@@ -23,9 +23,12 @@ function ProductProvider({ children }) {
       }
 
       const data = await response.json();
-      console.log("Add to cart successfully.", data);
+      console.log("Updated cart product successfully.", data);
+      return data;
+      
     } catch (error) {
-      console.log("Error in updating the product quantity & size:", error);
+      console.error("Error updating product:", error);
+      return false;
     }
   };
 

@@ -6,21 +6,31 @@ import { useEffect, useState, useContext } from "react";
 import StarRating from "../Components/StarRating";
 import { WishlistContext } from "../Contexts/WishlistContext";
 import { ProductContext } from "../Contexts/ProductsContext";
+import { CartContext } from "../Contexts/CartContext";
 
 function ProductDetailsPage() {
   const { wishlist, addToWishlist, removeFromWishlist } =
     useContext(WishlistContext);
 
+  const { cartList, addProductToCart, deleteProductFromCart } =
+    useContext(CartContext);
+
   const { updateProduct } = useContext(ProductContext);
 
   const [productData, setProductData] = useState({});
   const [quantity, setQuantity] = useState(1);
+  const [size, setSize] = useState("");
   const [moreProducts, setMoreProducts] = useState();
+
   const [wishlistData, setWishlistData] = useState([]);
+  const [cartData, setCartData] = useState([]);
 
   // alerts
   const [alertMessage, setAlertMessage] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
+  const [deleteAlert, setDeleteAlert] = useState(false);
+  const [addCartAlert, setAddCartAlert] = useState(false);
+  const [sizeChangeAlert, setSizeChangeAlert] = useState(false);
 
   //********* get Selected data  *********
   const dataId = useParams();
@@ -38,16 +48,22 @@ function ProductDetailsPage() {
       );
       setProductData(data.products);
       setQuantity(data.products.quantity);
+      setSize(data.products.selectedSize);
     }
   }, [data]);
   console.log("productData:-", productData);
 
   // for getting wishlist data
   useEffect(() => {
-    if (wishlist && Array.isArray(wishlist)) {
-      setWishlistData(wishlist.map((data) => data._id));
+    if (wishlist) {
+      const wishlistIds = wishlist.map((data) => data.productInfo._id);
+      setWishlistData(wishlistIds);
     }
-  }, [wishlist]);
+    if (cartList) {
+      const cartListIds = cartList.map((data) => data.productInfo._id);
+      setCartData(cartListIds);
+    }
+  }, [wishlist, cartList]);
 
   //****************** adding products to wishlist ******************
   const addToWishlistHandler = async (product) => {
@@ -67,6 +83,22 @@ function ProductDetailsPage() {
     setTimeout(() => {
       setShowAlert(false);
     }, 1000);
+  };
+
+  //*************** Delete product from cart ***************
+  const deleteCartHandler = async (data) => {
+    console.log("deleteCartHandler ;- ", data.products);
+    await deleteProductFromCart(data.products);
+    setDeleteAlert(true);
+    setTimeout(() => setDeleteAlert(false), 1000);
+  };
+
+  //*************** Add product from cart ***************
+  const addCartHandler = async (data) => {
+    console.log("addCartHandler ;- ", data.products);
+    await addProductToCart(data.products);
+    setAddCartAlert(true);
+    setTimeout(() => setAddCartAlert(false), 1000);
   };
 
   //***********  show more products ***********
@@ -104,6 +136,18 @@ function ProductDetailsPage() {
     }
   };
 
+  // Update product Size
+  const updateProductSize = (selectedSize) => {
+    console.log("updateProductSize ;-", selectedSize);
+    const updatedProduct = { ...productData, selectedSize };
+    setSize(selectedSize);
+    updateProduct(updatedProduct);
+    setSizeChangeAlert(true);
+    setTimeout(() => {
+      setSizeChangeAlert(false);
+    }, 1000);
+  };
+
   if (error || moreError) {
     <div
       className="d-flex justify-content-center align-items-center"
@@ -119,22 +163,21 @@ function ProductDetailsPage() {
     <>
       <Header />
       <div className="container pt-2">
-        {alertMessage && (
+        {(alertMessage || showAlert || deleteAlert || addCartAlert) && (
           <div
             className="position-absolute top-3 alert alert-success text-center"
             role="alert"
             style={{ width: "78%" }}
           >
-            <span className="fs-5 fw-medium">Added to Wishlist.</span>
-          </div>
-        )}
-        {showAlert && (
-          <div
-            className="position-absolute top-3 alert alert-success text-center"
-            role="alert"
-            style={{ width: "78%" }}
-          >
-            <span className="fs-5 fw-medium">Remove from Wishlist.</span>
+            <span className="fs-5 fw-medium">
+              {alertMessage
+                ? "Added to Wishlist."
+                : showAlert
+                ? "Removed from Wishlist."
+                : deleteAlert
+                ? "Removed from Cart."
+                : "Added to Cart."}
+            </span>
           </div>
         )}
       </div>
@@ -170,20 +213,27 @@ function ProductDetailsPage() {
                         className="my-2 btn btn-secondary text-light w-100 fs-5 fw-medium"
                         style={{ borderRadius: "0px" }}
                       >
-                        {wishlistData.includes(data._id)
+                        {wishlistData.includes(productData._id)
                           ? "Remove From Wishlist"
                           : "Add To Wishlist"}
-
-                        {/* {wishlist.some((prod) => prod._id == data._id)
-                          ? "Remove From Wishlist"
-                          : "Add To Wishlist"} */}
                       </button>
 
                       <button
-                        className="btn btn-danger text-light w-100 fs-5 fw-medium mt-2"
+                        onClick={(e) => {
+                          if (e.target.innerText === "Add To Cart") {
+                            addCartHandler(data);
+                            e.target.innerText = "Remove From Cart";
+                          } else {
+                            deleteCartHandler(data);
+                            e.target.innerText = "Add To Cart";
+                          }
+                        }}
+                        className="my-2 btn btn-danger text-light w-100 fs-5 fw-medium"
                         style={{ borderRadius: "0px" }}
                       >
-                        Add to Cart
+                        {cartData.includes(productData._id)
+                          ? "Remove From Cart"
+                          : "Add To Cart"}
                       </button>
                     </div>
                   </div>
@@ -200,31 +250,32 @@ function ProductDetailsPage() {
                   {/* Quantity Control */}
                   <div className="pt-3 pb-2">
                     <span className="fs-5 fw-medium me-2">Quantity: </span>
-                    <button
+                    <span className=" border px-3 py-1 rounded bg-light fw-medium">
+                      {quantity}
+                    </span>
+                    {/* <button
                       className="rounded bg-light"
                       onClick={() => handleIncrement(productData)}
                     >
                       <i className="bi bi-plus"></i>
-                    </button>
-                    <span className="mx-2">{quantity}</span>
-                    <button
+                    </button> */}
+                    {/* <button
                       className="rounded bg-light"
                       onClick={() => handleDecrement(productData)}
                     >
                       <i className="bi bi-dash"></i>
-                    </button>
+                    </button> */}
                   </div>
 
                   {/* Size Selection */}
                   <div className="d-flex py-4">
-                    <span className="fs-5 fw-medium me-2">Size:</span>
+                    <span className="fs-5 fw-medium me-2">Select Size:</span>
                     {productData.size?.map((sizeOption) => (
                       <button
                         key={sizeOption}
+                        onClick={() => updateProductSize(sizeOption)}
                         className={`bg-light border rounded p-2 py-1 me-2 ${
-                          productData.selectedSize === sizeOption
-                            ? "text-danger fw-bold"
-                            : ""
+                          size === sizeOption ? "text-danger fw-bolder" : ""
                         }`}
                       >
                         {sizeOption}
@@ -275,6 +326,9 @@ function ProductDetailsPage() {
           </div>
         )
       )}
+
+      {/* more products  */}
+
       <Footer />
     </>
   );
