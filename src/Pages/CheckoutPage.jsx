@@ -1,19 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
 import { useContext } from "react";
 import { AddressContext } from "../Contexts/AddressContext";
 import { CartContext } from "../Contexts/CartContext";
+import { Link } from "react-router-dom";
 
 function CheckoutPage() {
   const [message, setMessage] = useState(false);
 
-  const { userInfo } = useContext(AddressContext);
+  const { userInfo, getUserInfo } = useContext(AddressContext);
 
   const { cartList } = useContext(CartContext);
 
   const totalPrice = cartList.reduce(
-    (acc, curr) => (acc = acc + parseInt(curr.productInfo.price)),
+    (acc, curr) =>
+      acc +
+      parseInt(curr.productInfo.quantity) * parseInt(curr.productInfo.price),
     0
   );
 
@@ -21,6 +24,10 @@ function CheckoutPage() {
     setMessage(true);
     alert("Information regarding order will be sent to you email address.");
   };
+
+  useEffect(() => {
+    getUserInfo();
+  }, [getUserInfo]);
 
   return (
     <>
@@ -35,6 +42,9 @@ function CheckoutPage() {
                 Thank you for shopping with us. Your items will be delivered in
                 2-3 working days.
               </p>
+              <Link className="btn btn-danger fs-5" to="/products/All">
+                Continue Shopping
+              </Link>
             </div>
           ) : (
             <>
@@ -57,7 +67,7 @@ function CheckoutPage() {
                       <strong>Number: </strong> (+91) {data.phoneNumber}
                     </p>
                     <p className="fs-5">
-                      <strong>Order will ship to: </strong> {data.address}
+                      <strong>Shipping Address: </strong> {data.address}
                     </p>
                   </div>
                 ))}
@@ -71,16 +81,34 @@ function CheckoutPage() {
                 </p>
                 <p className="fs-5">
                   <strong>Total price of items: </strong>
-                  Rs. {totalPrice}{" "}
+                  <i class="bi bi-currency-rupee"></i>
+                  {totalPrice}
                   {totalPrice > 5000 ? (
-                    <span className="fs-5 fw-medium text-success">
-                      (<i className="bi bi-check-lg"></i> Eligible for free
-                      delivery)
+                    <span className="fs-5 fw-medium text-success mx-2">
+                      (<i className="bi bi-check-lg"></i>Eligible for free
+                      delivery )
                     </span>
                   ) : (
-                    ""
+                    <span className="fs-5">
+                      <strong> +</strong> Delivery charges(
+                      <i class="bi bi-currency-rupee"></i>200)
+                      <br />
+                    </span>
                   )}
                 </p>
+                {totalPrice < 5000 && (
+                  <>                   
+                    <p className="fs-5">
+                      <span>
+                        {" "}
+                        <strong className="">
+                         Sub Total:{" "}
+                        </strong>{" "}
+                        <i class="bi bi-currency-rupee"></i>{totalPrice + 200}
+                      </span>
+                    </p>
+                  </>
+                )}
                 <p className="fs-5">
                   <strong>Mode Of Payment: </strong> Cash On Delivery
                 </p>

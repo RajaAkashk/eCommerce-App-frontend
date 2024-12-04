@@ -120,21 +120,21 @@ function ProductDetailsPage() {
   console.log("moreProducts:-", moreProducts);
 
   // Update product quantity
-  const handleIncrement = (product) => {
-    if (product.quantity < 20) {
-      const updatedProduct = { ...product, quantity: product.quantity + 1 };
-      updateProduct(updatedProduct);
-      setQuantity((prevQuantity) => prevQuantity + 1);
-    }
-  };
+  // const handleIncrement = (product) => {
+  //   if (product.quantity < 20) {
+  //     const updatedProduct = { ...product, quantity: product.quantity + 1 };
+  //     updateProduct(updatedProduct);
+  //     setQuantity((prevQuantity) => prevQuantity + 1);
+  //   }
+  // };
 
-  const handleDecrement = (product) => {
-    if (quantity > 1) {
-      const updatedProduct = { ...product, quantity: product.quantity - 1 };
-      updateProduct(updatedProduct);
-      setQuantity((prevQuantity) => prevQuantity - 1);
-    }
-  };
+  // const handleDecrement = (product) => {
+  //   if (quantity > 1) {
+  //     const updatedProduct = { ...product, quantity: product.quantity - 1 };
+  //     updateProduct(updatedProduct);
+  //     setQuantity((prevQuantity) => prevQuantity - 1);
+  //   }
+  // };
 
   // Update product Size
   const updateProductSize = (selectedSize) => {
@@ -163,7 +163,11 @@ function ProductDetailsPage() {
     <>
       <Header />
       <div className="container pt-2">
-        {(alertMessage || showAlert || deleteAlert || addCartAlert) && (
+        {(alertMessage ||
+          showAlert ||
+          deleteAlert ||
+          addCartAlert ||
+          sizeChangeAlert) && (
           <div
             className="position-absolute top-3 alert alert-success text-center"
             role="alert"
@@ -176,6 +180,8 @@ function ProductDetailsPage() {
                 ? "Removed from Wishlist."
                 : deleteAlert
                 ? "Removed from Cart."
+                : sizeChangeAlert
+                ? `Selected Size "${size}"`
                 : "Added to Cart."}
             </span>
           </div>

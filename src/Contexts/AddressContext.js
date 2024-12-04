@@ -18,6 +18,23 @@ const AddressContextProvider = ({ children }) => {
     }
   }, [data]);
 
+  const getUserInfo = async () => {
+    try {
+      const response = await fetch(
+        "https://e-commerce-app-backend-seven.vercel.app/get/user/info"
+      );
+
+      if (!response.ok) {
+        console.log("error in getting response");
+      }
+
+      const data = await response.json();
+      setUserInfo(data.user);
+    } catch (error) {
+      console.log("Failed to get data from database.");
+    }
+  };
+
   const getAllAddress = async () => {
     try {
       const response = await fetch(
@@ -103,7 +120,6 @@ const AddressContextProvider = ({ children }) => {
 
       setAddress(address.filter((data) => data._id !== addressId));
 
-
       console.log("Deleted from address database.", data);
     } catch (error) {
       console.log("Error in deleting address from address database.", error);
@@ -119,6 +135,7 @@ const AddressContextProvider = ({ children }) => {
         updateUserAddress,
         getAllAddress,
         deleteAddress,
+        getUserInfo,
         loading,
         error,
       }}
