@@ -198,9 +198,9 @@ const ProductCartPage = () => {
             alertForQuantityIncrease ||
             alertForQuantityDecrease) && (
             <div
-              className="alert alert-success text-center position-fixed top-1"
+              className="alert alert-success text-center position-fixed  top-1"
               role="alert"
-              style={{ width: "80%", zIndex: "9999" }}
+              style={{ width: "50%", zIndex: "9999", left: "28rem" }}
             >
               <span className="fs-5 fw-medium">
                 {alertMessage
@@ -315,9 +315,7 @@ const ProductCartPage = () => {
                                 className="my-2 btn btn-secondary text-light w-100 fs-5 fw-medium"
                                 style={{ borderRadius: "0px" }}
                               >
-                                {newStore.find(
-                                  (prod) => prod === data.productInfo._id
-                                )
+                                {newStore.find((prod) => prod === data._id)
                                   ? "Remove From Wishlist"
                                   : "Add To Wishlist"}
                               </button>

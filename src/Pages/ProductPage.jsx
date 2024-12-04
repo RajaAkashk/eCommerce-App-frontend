@@ -13,6 +13,11 @@ function ProductPage() {
   const [productDataCopy, setProductDataCopy] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  // filters
+  const [productPrice, setProductPrice] = useState("");
+  const [requiredRating, setRequiredRating] = useState("");
+  const [sortOptionValue, setSortOptionValue] = useState("");
+
   const [isHovered, setIsHovered] = useState(false);
   const [isAdded, setIsAdded] = useState(false);
 
@@ -22,13 +27,15 @@ function ProductPage() {
   const [cartStore, setCartStore] = useState([]);
 
   // contexts
-  const { wishlist, addToWishlist } = useContext(WishlistContext);
+  const { wishlist, addToWishlist, removeFromWishlist } =
+    useContext(WishlistContext);
   const { cartList, addProductToCart, deleteProductFromCart } =
     useContext(CartContext);
 
   // All Alerts
   const [deleteAlert, setDeleteAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   const [alertMessageForWishlist, setAlertMessageForWishlist] = useState(false);
   const [addCartMesssage, setAddCartMesssage] = useState(false);
 
@@ -100,7 +107,7 @@ function ProductPage() {
     }
   }, [productsData, wishlistData]);
 
-  console.log("newStore:-", newStore);
+  console.log("newStore wishlist data id same as product id:-", newStore);
 
   useEffect(() => {
     if (cartList) {
@@ -149,7 +156,12 @@ function ProductPage() {
 
   //clear All Filters
   const clearAllFilters = () => {
-    window.location.reload();
+    // window.location.reload();
+    setProductPrice(""); // Reset the price filter
+    setRequiredRating(""); // Reset the rating filter
+    setSortOptionValue(""); // Reset the Sort filter
+    setProductsData(data.products);
+    console.log("setProductsData :-", data.products);
   };
 
   // For clear btn hover
@@ -158,6 +170,7 @@ function ProductPage() {
 
   //Clothing category Handler
   const navigate = useNavigate();
+
   const categoryHandler = (event) => {
     const { value, checked } = event.target;
     setSelectedCategory(value);
@@ -168,27 +181,42 @@ function ProductPage() {
 
   //Price range Handler
   const rangeHandler = (event) => {
+    // setProductPrice(event.target.value);
+    // const productPrice = event.target.value;
+    // console.log("product Price:-", productPrice);
+    // if (event.target.value) {
+    //   const filteredByPrice = [...productDataCopy].filter(
+    //     (data) => data.price <= productPrice
+    //   );
+    //   console.log("filter PRICE RANGE - ", productsData);
+    //   console.log("SELECTED PRICE RANGE - ", productPrice);
+    //   console.log("filtered By Price:-", filteredByPrice);
+    //   setProductsData(filteredByPrice);
+    // } else {
+    //   setProductsData(productsData);
+    // }
     const productPrice = event.target.value;
+    setProductPrice(productPrice); // Update the price state
     console.log("product Price:-", productPrice);
-    if (productPrice) {
+
+    if (productPrice.length > 0) {
       const filteredByPrice = [...productDataCopy].filter(
         (data) => data.price <= productPrice
       );
-      console.log("filter PRICE RANGE - ", productsData);
-      console.log("SELECTED PRICE RANGE - ", productPrice);
       console.log("filtered By Price:-", filteredByPrice);
       setProductsData(filteredByPrice);
     } else {
-      setProductsData(productsData);
+      setProductsData(productsData); // Reset to the original list if no price is selected
     }
   };
 
   // filter  by rating
   const productsRatingHandler = (event) => {
     const requiredRating = event.target.value;
+    setRequiredRating(requiredRating); // Update the rating state
     console.log("required Rating:-", requiredRating);
     if (requiredRating) {
-      const filteredByRating = [...productsData].filter(
+      const filteredByRating = [...productDataCopy].filter(
         (data) => data.rating === parseInt(requiredRating)
       );
       console.log("filter RATING - ", productDataCopy);
@@ -202,6 +230,7 @@ function ProductPage() {
   //Sort by Price
   const SortPrice = (event) => {
     const sortOption = event.target.value;
+    setSortOptionValue(event.target.value);
     console.log("sort Option:-", sortOption);
     const sortedProducts = [...productsData].sort((a, b) =>
       sortOption === "Low to High" ? a.price - b.price : b.price - a.price
@@ -225,10 +254,10 @@ function ProductPage() {
   }
 
   // alert message for product already present in wishlist
-  const setAlertForWishlist = () => {
-    setAlertMessageForWishlist(true);
-    setTimeout(() => setAlertMessageForWishlist(false), 1000);
-  };
+  // const setAlertForWishlist = () => {
+  //   setAlertMessageForWishlist(true);
+  //   setTimeout(() => setAlertMessageForWishlist(false), 1000);
+  // };
 
   console.log("wishlist from context now in product page :-", wishlist);
   //****************** adding products to wishlist ******************
@@ -240,7 +269,16 @@ function ProductPage() {
     setTimeout(() => {
       setAlertMessage(false);
     }, 1000);
-    // CAll the products
+  };
+
+  //****************** Removing product from wishlist ******************
+  const removefromwishlistHandler = async (product) => {
+    console.log("remove from wish list Handler :- ", product);
+    removeFromWishlist(product);
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 1000);
   };
 
   //********************* Add Product To Cart *********************
@@ -331,12 +369,13 @@ function ProductPage() {
                   {" "}
                   <span className="me-4 fs-5"> ₹ 1K</span>{" "}
                   <span className="mx-5 fs-5">₹ 4K</span>{" "}
-                  <span className="mx-4 fs-5">₹ 7K</span>{" "}
+                  <span className="mx-4 fs-5">₹ 6K</span>{" "}
                 </p>
                 <input
                   type="range"
                   class="form-range"
                   onChange={rangeHandler}
+                  value={productPrice}
                   min="1000"
                   max="7000"
                   step="200"
@@ -354,6 +393,7 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="5"
+                    checked={requiredRating == 5}
                     onChange={productsRatingHandler}
                   />
                   <i class="bi bi-star-fill text-warning"></i>{" "}
@@ -366,6 +406,7 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="4"
+                    checked={requiredRating == 4}
                     onChange={productsRatingHandler}
                   />
                   <i class="bi bi-star-fill text-warning"></i>{" "}
@@ -377,6 +418,7 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="3"
+                    checked={requiredRating == 3}
                     onChange={productsRatingHandler}
                   />
                   <i class="bi bi-star-fill text-warning"></i>{" "}
@@ -387,6 +429,7 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="2"
+                    checked={requiredRating == 2}
                     onChange={productsRatingHandler}
                   />
                   <i class="bi bi-star-fill text-warning"></i>{" "}
@@ -396,6 +439,7 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="1"
+                    checked={requiredRating == 1}
                     onChange={productsRatingHandler}
                   />
                   <i class="bi bi-star-fill text-warning"></i> <br />
@@ -411,6 +455,7 @@ function ProductPage() {
                     name="sortBy"
                     className="me-1 form-check-input"
                     value="Low to High"
+                    checked={sortOptionValue == "Low to High"}
                     onChange={SortPrice}
                   />
                   Price - Low to High
@@ -420,6 +465,7 @@ function ProductPage() {
                     name="sortBy"
                     className="me-1 form-check-input"
                     value="High to Low"
+                    checked={sortOptionValue == "High to Low"}
                     onChange={SortPrice}
                   />
                   Price - High to Low <br />
@@ -431,7 +477,10 @@ function ProductPage() {
             <div className="col-md-9 ">
               <div className="container py-4">
                 {/***************** Alerts *****************/}
-                {(alertMessage || deleteAlert || addCartMesssage) && (
+                {(alertMessage ||
+                  deleteAlert ||
+                  addCartMesssage ||
+                  showAlert) && (
                   <div
                     className="alert alert-success text-center"
                     style={{
@@ -452,17 +501,19 @@ function ProductPage() {
                         <>Deleted from Cart.</>
                       ) : addCartMesssage ? (
                         <>Added to Cart</>
+                      ) : showAlert ? (
+                        <>Delete From Wishlist</>
                       ) : null}
                     </span>
                   </div>
                 )}
-                {alertMessageForWishlist && (
+                {/* {alertMessageForWishlist && (
                   <div className="alert alert-danger text-center" role="alert">
                     <span className="fs-5 fw-medium">
                       Product already present in Wishlist.
                     </span>
                   </div>
-                )}
+                )} */}
 
                 {/**************** All the products ****************/}
                 {productsData ? (
@@ -480,7 +531,7 @@ function ProductPage() {
                               <StarRating rating={data.rating} />
                             </span>
                             {/* add to wishlist heart icon  */}
-                            <i
+                            {/* <i
                               onClick={
                                 !newStore.includes(data._id)
                                   ? () => addToWishlistHandler(data)
@@ -491,22 +542,7 @@ function ProductPage() {
                                   ? "bi-heart-fill text-danger"
                                   : "bi-heart"
                               } position-absolute top-0 end-0 me-3 mt-2 fs-1`}
-                            ></i>
-                            {/* <button
-                              onClick={(e) => {
-                                e.target = setIsAdded(!isAdded);
-                                if (!isAdded) {
-                                  addToWishlistHandler(data); // Add to wishlist
-                                }
-                              }}
-                              className="border-0 bg-transparent position-absolute top-0 end-0 me-3 mt-2 fs-1"
-                            >
-                              {isAdded ? (
-                                <i className="bi bi-heart-fill text-danger"></i>
-                              ) : (
-                                <i className="bi bi-heart"></i>
-                              )}
-                            </button> */}{" "}
+                            ></i>{" "} */}
                             <Link to={`/productsPage/${data._id}`}>
                               {" "}
                               <img
@@ -527,6 +563,27 @@ function ProductPage() {
                               <p className="card-text py-0 px-3 fs-4 fw-medium">
                                 ₹ {data.price}
                               </p>
+                              {/*************Add To Wishlist button *************/}
+                              <button
+                                onClick={(e) => {
+                                  if (
+                                    e.target.innerText === "Add To Wishlist"
+                                  ) {
+                                    addToWishlistHandler(data);
+                                    e.target.innerText = "Remove From Wishlist";
+                                  } else {
+                                    removefromwishlistHandler(data);
+                                    e.target.innerText = "Add To Wishlist";
+                                  }
+                                }}
+                                className="btn btn-secondary text-light w-100 fs-5 fw-medium"
+                                style={{ borderRadius: "0px" }}
+                              >
+                                {newStore.find((prod) => prod === data._id)
+                                  ? "Remove From Wishlist"
+                                  : "Add To Wishlist"}
+                              </button>
+
                               {/**************** Add to cart button  ****************/}
                               <button
                                 onClick={(e) => {
@@ -552,7 +609,7 @@ function ProductPage() {
                     </div>
                   </>
                 ) : (
-                  !loading && (
+                  loading && (
                     <div
                       className="d-flex justify-content-center align-items-center"
                       style={{ height: "100vh" }}
