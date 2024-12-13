@@ -11,7 +11,7 @@ function Header({ onSearch }) {
 
   const handleSearch = (e) => {
     setSearchTerm(e.target.value);
-    onSearch(e.target.value); // Pass search term to parent
+    onSearch(e.target.value); // Pass the search term to parent
   };
   return (
     <>

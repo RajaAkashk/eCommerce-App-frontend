@@ -36,26 +36,7 @@ function Header() {
               className="collapse navbar-collapse"
               id="navbarSupportedContent"
             >
-              {/************ Search ************/}
-              <div className="col-md-5">
-                {/* <div className="input-group border rounded">
-                  <span className="input-group-text bg-white border-0">
-                    <i className="bi bi-search"></i>
-                  </span>
-
-                  <input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    onClick={searchHandler} // Or use a button to trigger the search
-                    style={{ outline: "none", boxShadow: "none" }}
-                    className="form-control border-0"
-                    type="text"
-                    placeholder="Search"
-                    aria-label="Search"
-                  />
-                </div> */}
-              </div>
-
+            
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li className="nav-item">
                   <Link className="nav-link" aria-current="page" to="/userPage">

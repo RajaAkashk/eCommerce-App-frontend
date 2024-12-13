@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Header from "../Components/Header";
-import Footer from "../Components/Footer";
 import { useContext } from "react";
 import { AddressContext } from "../Contexts/AddressContext";
 import { CartContext } from "../Contexts/CartContext";

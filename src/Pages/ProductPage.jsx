@@ -3,7 +3,7 @@ import Footer from "../Components/Footer";
 import { useState, useEffect, useContext } from "react";
 import useFetch from "../useFetch";
 import StarRating from "../Components/StarRating";
-import { Link, useParams, useLocation, useNavigate } from "react-router-dom";
+import { Link, useParams, useNavigate } from "react-router-dom";
 
 import { WishlistContext } from "../Contexts/WishlistContext";
 import { CartContext } from "../Contexts/CartContext";
@@ -19,7 +19,6 @@ function ProductPage() {
   const [sortOptionValue, setSortOptionValue] = useState("");
 
   const [isHovered, setIsHovered] = useState(false);
-  const [isAdded, setIsAdded] = useState(false);
 
   const [wishlistData, setWishlistData] = useState([]);
   const [newStore, setNewStore] = useState([]);
@@ -40,7 +39,7 @@ function ProductPage() {
   const [addCartMesssage, setAddCartMesssage] = useState(false);
 
   const { productCategory } = useParams();
-  // i have made it let so that in category select i can use it .
+  // to store value a selected category
   let category;
   selectedCategory
     ? (category = selectedCategory)
@@ -67,7 +66,7 @@ function ProductPage() {
   // Handle search term and filter products
   const handleSearch = (searchTerm) => {
     if (searchTerm === "") {
-      setProductsData(productsData); // Show all products if search is cleared
+      setProductsData(productsData);
     } else {
       const filtered = productDataCopy.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -80,7 +79,6 @@ function ProductPage() {
   useEffect(() => {
     setWishlistData(wishlist);
     if (productsData.length > 0 && wishlistData.length > 0) {
-      // Initialize a new array to store matched products
       let matchedProducts = [];
       wishlistData.map((wishlistItem) => {
         const wishlistProductId = wishlistItem.productInfo?._id;
@@ -119,7 +117,6 @@ function ProductPage() {
 
   useEffect(() => {
     if (productsData.length > 0 && cartStoreData.length > 0) {
-      // Initialize a new array to store matched products
       let matchedProducts = [];
       cartStoreData.map((cartItem) => {
         const cartProductId = cartItem.productInfo?._id;
@@ -156,10 +153,9 @@ function ProductPage() {
 
   //clear All Filters
   const clearAllFilters = () => {
-    // window.location.reload();
-    setProductPrice(""); // Reset the price filter
-    setRequiredRating(""); // Reset the rating filter
-    setSortOptionValue(""); // Reset the Sort filter
+    setProductPrice("");
+    setRequiredRating("");
+    setSortOptionValue("");
     setProductsData(data.products);
     console.log("setProductsData :-", data.products);
   };
@@ -172,29 +168,15 @@ function ProductPage() {
   const navigate = useNavigate();
 
   const categoryHandler = (event) => {
-    const { value, checked } = event.target;
+    const { value } = event.target;
     setSelectedCategory(value);
     navigate(`/products/${value}`);
-    clearAllFilters(); // so that all filter also back to default.
+    clearAllFilters(); // all filter also back to default.
   };
   console.log("selectedCategory-", selectedCategory);
 
   //Price range Handler
   const rangeHandler = (event) => {
-    // setProductPrice(event.target.value);
-    // const productPrice = event.target.value;
-    // console.log("product Price:-", productPrice);
-    // if (event.target.value) {
-    //   const filteredByPrice = [...productDataCopy].filter(
-    //     (data) => data.price <= productPrice
-    //   );
-    //   console.log("filter PRICE RANGE - ", productsData);
-    //   console.log("SELECTED PRICE RANGE - ", productPrice);
-    //   console.log("filtered By Price:-", filteredByPrice);
-    //   setProductsData(filteredByPrice);
-    // } else {
-    //   setProductsData(productsData);
-    // }
     const productPrice = event.target.value;
     setProductPrice(productPrice); // Update the price state
     console.log("product Price:-", productPrice);
@@ -206,7 +188,7 @@ function ProductPage() {
       console.log("filtered By Price:-", filteredByPrice);
       setProductsData(filteredByPrice);
     } else {
-      setProductsData(productsData); // Reset to the original list if no price is selected
+      setProductsData(productsData);
     }
   };
 
@@ -252,12 +234,6 @@ function ProductPage() {
       </div>
     );
   }
-
-  // alert message for product already present in wishlist
-  // const setAlertForWishlist = () => {
-  //   setAlertMessageForWishlist(true);
-  //   setTimeout(() => setAlertMessageForWishlist(false), 1000);
-  // };
 
   console.log("wishlist from context now in product page :-", wishlist);
   //****************** adding products to wishlist ******************
@@ -496,24 +472,17 @@ function ProductPage() {
                   >
                     <span className="fs-5 fw-medium">
                       {alertMessage ? (
-                        <>Added to Wishlist.</>
+                        <>Added to Wishlist</>
                       ) : deleteAlert ? (
-                        <>Deleted from Cart.</>
+                        <>Removed from Cart</>
                       ) : addCartMesssage ? (
                         <>Added to Cart</>
                       ) : showAlert ? (
-                        <>Delete From Wishlist</>
+                        <>Removed From Wishlist</>
                       ) : null}
                     </span>
                   </div>
                 )}
-                {/* {alertMessageForWishlist && (
-                  <div className="alert alert-danger text-center" role="alert">
-                    <span className="fs-5 fw-medium">
-                      Product already present in Wishlist.
-                    </span>
-                  </div>
-                )} */}
 
                 {/**************** All the products ****************/}
                 {productsData ? (
@@ -530,19 +499,7 @@ function ProductPage() {
                             <span className="position-absolute top-0 mt-3 ms-2">
                               <StarRating rating={data.rating} />
                             </span>
-                            {/* add to wishlist heart icon  */}
-                            {/* <i
-                              onClick={
-                                !newStore.includes(data._id)
-                                  ? () => addToWishlistHandler(data)
-                                  : () => setAlertForWishlist()
-                              }
-                              className={`bi ${
-                                newStore.find((prod) => prod == data._id)
-                                  ? "bi-heart-fill text-danger"
-                                  : "bi-heart"
-                              } position-absolute top-0 end-0 me-3 mt-2 fs-1`}
-                            ></i>{" "} */}
+
                             <Link to={`/productsPage/${data._id}`}>
                               {" "}
                               <img

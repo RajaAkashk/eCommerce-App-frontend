@@ -53,7 +53,6 @@ function UserPage() {
       newAddress.zipcode
     ) {
       addUserAddress(newAddress);
-      // getAllAddress();
       setAlert(true);
       setTimeout(() => setAlert(false), 1500);
     }
@@ -74,8 +73,8 @@ function UserPage() {
     updateUserAddress(userId, updatedAddress);
 
     setAddress(updatedAddress);
-    setUpdateMessage(true)
-    setTimeout(() => setUpdateMessage(false), 1000)
+    setUpdateMessage(true);
+    setTimeout(() => setUpdateMessage(false), 1000);
   };
 
   const deleteAddressHandler = (addressId) => {
@@ -105,13 +104,13 @@ function UserPage() {
               <div className="row g-0 py-2 px-4">
                 {loading ? (
                   <div className="text-center">
-                    <div class="spinner-border text-danger" role="status">
-                      <span class="visually-hidden">Loading...</span>
+                    <div className="spinner-border text-danger" role="status">
+                      <span className="visually-hidden">Loading...</span>
                     </div>
                   </div>
                 ) : (
                   <>
-                    {userInfo?.map((user) => (
+                    {userInfo?.map((user, index) => (
                       <>
                         <div className="col-md-4 d-flex align-items-center">
                           <img
@@ -148,12 +147,12 @@ function UserPage() {
                 )}
                 <div className="mt-4 text-center">
                   <h2 className="m-0 p-0">Choose one Address</h2>
-                  {(deleteMessage || updateMessage )&& (
+                  {(deleteMessage || updateMessage) && (
                     <div class="alert alert-success text-center" role="alert">
                       <span className="fs-5">
-                       {deleteMessage && "Successfully Deleted Address"}
-                       {updateMessage && "New Address Added"}
-                        </span>
+                        {deleteMessage && "Successfully Deleted Address"}
+                        {updateMessage && "New Address Added"}
+                      </span>
                     </div>
                   )}
 
@@ -163,10 +162,12 @@ function UserPage() {
                         <li className="list-group-item">
                           <div className="text-center">
                             <div
-                              class="spinner-border text-danger"
+                              className="spinner-border text-danger"
                               role="status"
                             >
-                              <span class="visually-hidden">Loading...</span>
+                              <span className="visually-hidden">
+                                Loading...
+                              </span>
                             </div>
                           </div>
                         </li>
@@ -182,7 +183,6 @@ function UserPage() {
                               name="address"
                               value={`${data.houseNumber}, ${data.street}, ${data.city}, ${data.state}, ${data.zipcode}`}
                               checked={
-                                // userInfo.filter((data) => data.address) ||
                                 ChoosenAddress ===
                                 `${data.houseNumber}, ${data.street}, ${data.city}, ${data.state}, ${data.zipcode}`
                               }

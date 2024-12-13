@@ -119,22 +119,7 @@ function ProductDetailsPage() {
 
   console.log("moreProducts:-", moreProducts);
 
-  // Update product quantity
-  // const handleIncrement = (product) => {
-  //   if (product.quantity < 20) {
-  //     const updatedProduct = { ...product, quantity: product.quantity + 1 };
-  //     updateProduct(updatedProduct);
-  //     setQuantity((prevQuantity) => prevQuantity + 1);
-  //   }
-  // };
 
-  // const handleDecrement = (product) => {
-  //   if (quantity > 1) {
-  //     const updatedProduct = { ...product, quantity: product.quantity - 1 };
-  //     updateProduct(updatedProduct);
-  //     setQuantity((prevQuantity) => prevQuantity - 1);
-  //   }
-  // };
 
   // Update product Size
   const updateProductSize = (selectedSize) => {
