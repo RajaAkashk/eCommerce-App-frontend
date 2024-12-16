@@ -19,6 +19,10 @@ const WishlistPage = () => {
   const [addCartMesssage, setAddCartMesssage] = useState(false);
   const [removeCartMesssage, setRemoveCartMesssage] = useState(false);
 
+  useEffect(() => {
+    matchProducts2();
+  }, []);
+
   // useEffect(() => {
   //   if (wishlist) {
   //     setWishlistData(wishlist);
@@ -93,10 +97,6 @@ const WishlistPage = () => {
       }
     }
   };
-
-  useEffect(() => {
-    matchProducts2();
-  }, []);
 
   return (
     <>
