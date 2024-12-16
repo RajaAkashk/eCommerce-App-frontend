@@ -50,19 +50,22 @@ const ProductCartPage = () => {
   };
 
   useEffect(() => {
-    if (cartList) {
+    // if (cartList) {
       setCartListData(cartList);
       console.log("setCartListData :-", cartList);
-    }
+    // }
   }, [cartList]);
 
+  useEffect(() => {
+    updatedTheFetchData();
+  }, [updatedTheFetchData]);
+  
   // To check the cart product and wishlist product are same wishlist
 
   console.log("WISHLIST DATA FROM CART :", wishlist);
   console.log("cartList DATA FROM CART :", cartList);
 
-  // Matching cart data with wishlist data.
-  useEffect(() => {
+  const matchProducts = () => {
     if (cartList.length > 0 && wishlist.length > 0) {
       let matchedProducts = [];
 
@@ -84,14 +87,19 @@ const ProductCartPage = () => {
             console.log("No matching product found for wishlist item:");
           }
         }
-      });
+      },[]);
 
       // Update newStore with matched product ids
       if (matchedProducts.length > 0) {
         setNewStore(matchedProducts);
       }
     }
-  }, [cartList, wishlist]);
+  }
+
+  // Matching cart data with wishlist data.
+  useEffect(() => {
+    matchProducts()
+  }, []);
 
   console.log("NEW STORE:::::", newStore);
 
@@ -182,9 +190,7 @@ const ProductCartPage = () => {
   //   wishlist;
   // };
 
-  useEffect(() => {
-    updatedTheFetchData();
-  }, [updatedTheFetchData]);
+
 
   return (
     <>

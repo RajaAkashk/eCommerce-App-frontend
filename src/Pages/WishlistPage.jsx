@@ -61,7 +61,7 @@ const WishlistPage = () => {
     setTimeout(() => setRemoveCartMesssage(false), 1000);
   };
 
-  useEffect(() => {
+  const matchProducts2 = () => {
     if (wishlist.length > 0 && cartList.length > 0) {
       let matchedProducts = [];
       cartList.forEach((cartItem) => {
@@ -92,7 +92,11 @@ const WishlistPage = () => {
         });
       }
     }
-  }, [wishlist, cartList, cartStore]);
+  };
+
+  useEffect(() => {
+    matchProducts2();
+  }, []);
 
   return (
     <>
