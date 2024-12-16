@@ -8,7 +8,6 @@ import { CartContext } from "../Contexts/CartContext";
 
 const WishlistPage = () => {
   const [cartStore, setCartStore] = useState([]);
-  const [wishlistData, setWishlistData] = useState([]);
   const { wishlist, removeFromWishlist, loading, error } =
     useContext(WishlistContext);
 
@@ -22,12 +21,6 @@ const WishlistPage = () => {
   useEffect(() => {
     matchProducts2();
   }, []);
-
-  // useEffect(() => {
-  //   if (wishlist) {
-  //     setWishlistData(wishlist);
-  //   }
-  // }, wishlist);
 
   if (error) {
     return (

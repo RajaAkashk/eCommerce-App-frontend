@@ -34,10 +34,8 @@ const ProductCartPage = () => {
   const [newStore, setNewStore] = useState([]);
 
   useEffect(() => {
-    // if (cartList) {
     setCartListData(cartList);
     console.log("setCartListData :-", cartList);
-    // }
   }, [cartList]);
 
   useEffect(() => {
@@ -143,11 +141,9 @@ const ProductCartPage = () => {
 
       // Await backend response to update the product
       const updatedBackendProduct = await updateProduct(updatedProduct);
-      // Returns updated product from backend
       console.log("updatedBackendProduct :-", updatedBackendProduct);
 
       if (updatedBackendProduct) {
-        // Update cartListData with the updated productInfo
         setCartListData((prevCartList) =>
           prevCartList.map((item) =>
             item.productInfo._id === updatedBackendProduct.products._id
@@ -186,9 +182,6 @@ const ProductCartPage = () => {
     }
   };
 
-  // const cartListNew = () => {
-  //   wishlist;
-  // };
 
   return (
     <>

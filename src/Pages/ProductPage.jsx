@@ -267,7 +267,6 @@ function ProductPage() {
   //****************** products page ******************
   return (
     <>
-      {/* <Header wishlist={wishlistData} /> */}
       <Header2 onSearch={handleSearch} />
       <section>
         <div className="container-fluid">
