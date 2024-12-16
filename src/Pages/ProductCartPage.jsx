@@ -33,6 +33,22 @@ const ProductCartPage = () => {
   const [cartListData, setCartListData] = useState([]);
   const [newStore, setNewStore] = useState([]);
 
+  useEffect(() => {
+    // if (cartList) {
+    setCartListData(cartList);
+    console.log("setCartListData :-", cartList);
+    // }
+  }, [cartList]);
+
+  useEffect(() => {
+    updatedTheFetchData();
+  }, []);
+
+  // Matching cart data with wishlist data.
+  useEffect(() => {
+    matchProducts();
+  }, []);
+
   //******************** Error Handling ********************
   if (error) {
     return (
@@ -49,17 +65,6 @@ const ProductCartPage = () => {
     setTimeout(() => setDeleteAlert(false), 1000);
   };
 
-  useEffect(() => {
-    // if (cartList) {
-      setCartListData(cartList);
-      console.log("setCartListData :-", cartList);
-    // }
-  }, [cartList]);
-
-  useEffect(() => {
-    updatedTheFetchData();
-  }, [updatedTheFetchData]);
-  
   // To check the cart product and wishlist product are same wishlist
 
   console.log("WISHLIST DATA FROM CART :", wishlist);
@@ -87,19 +92,14 @@ const ProductCartPage = () => {
             console.log("No matching product found for wishlist item:");
           }
         }
-      },[]);
+      });
 
       // Update newStore with matched product ids
       if (matchedProducts.length > 0) {
         setNewStore(matchedProducts);
       }
     }
-  }
-
-  // Matching cart data with wishlist data.
-  useEffect(() => {
-    matchProducts()
-  }, []);
+  };
 
   console.log("NEW STORE:::::", newStore);
 
@@ -189,8 +189,6 @@ const ProductCartPage = () => {
   // const cartListNew = () => {
   //   wishlist;
   // };
-
-
 
   return (
     <>
