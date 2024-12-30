@@ -102,24 +102,22 @@ function ProductDetailsPage() {
   };
 
   //***********  show more products ***********
-  console.log("productData category:-", productData.category);
-  const {
-    data: moreProductsData,
-    loading: moreLoading,
-    error: moreError,
-  } = useFetch(
-    `https://e-commerce-app-backend-seven.vercel.app/products/category/${productData.category}`
-  );
-  useEffect(() => {
-    if (moreProductsData) {
-      console.log("moreProductsData:", moreProductsData.products);
-      setMoreProducts(moreProductsData.products);
-    }
-  }, [moreProductsData]);
+  // console.log("productData category:-", productData.category);
+  // const {
+  //   data: moreProductsData,
+  //   loading: moreLoading,
+  //   error: moreError,
+  // } = useFetch(
+  //   `https://e-commerce-app-backend-seven.vercel.app/products/category/${productData.category}`
+  // );
+  // useEffect(() => {
+  //   if (moreProductsData) {
+  //     console.log("moreProductsData:", moreProductsData.products);
+  //     setMoreProducts(moreProductsData.products);
+  //   }
+  // }, [moreProductsData]);
 
-  console.log("moreProducts:-", moreProducts);
-
-
+  // console.log("moreProducts:-", moreProducts);
 
   // Update product Size
   const updateProductSize = (selectedSize) => {
@@ -133,7 +131,7 @@ function ProductDetailsPage() {
     }, 1000);
   };
 
-  if (error || moreError) {
+  if (error) {
     <div
       className="d-flex justify-content-center align-items-center"
       style={{ height: "100vh" }}
@@ -148,15 +146,14 @@ function ProductDetailsPage() {
     <>
       <Header />
       <div className="container pt-2">
-        {(alertMessage ||
+        {(!alertMessage ||
           showAlert ||
           deleteAlert ||
           addCartAlert ||
           sizeChangeAlert) && (
           <div
-            className="position-absolute top-3 alert alert-success text-center"
+            className="position-absolute top-3 alert alert-success text-center alertMessageDetailPage"
             role="alert"
-            style={{ width: "78%" }}
           >
             <span className="fs-5 fw-medium">
               {alertMessage
@@ -174,7 +171,7 @@ function ProductDetailsPage() {
       </div>
       {data ? (
         <>
-          <section className="py-4">
+          <section className="py-4 vh-100">
             <div className="container bg-white">
               <div className="row p-4 py-5">
                 {/* Product Image and Actions */}
@@ -231,7 +228,7 @@ function ProductDetailsPage() {
                 </div>
 
                 {/* Product Details */}
-                <div className="col-md-8 px-5">
+                <div className="col-md-8 custom-px-5">
                   <h1>{productData.name}</h1>
                   <div className="pt-2">
                     <StarRating rating={productData.rating} />
@@ -244,18 +241,6 @@ function ProductDetailsPage() {
                     <span className=" border px-3 py-1 rounded bg-light fw-medium">
                       {quantity}
                     </span>
-                    {/* <button
-                      className="rounded bg-light"
-                      onClick={() => handleIncrement(productData)}
-                    >
-                      <i className="bi bi-plus"></i>
-                    </button> */}
-                    {/* <button
-                      className="rounded bg-light"
-                      onClick={() => handleDecrement(productData)}
-                    >
-                      <i className="bi bi-dash"></i>
-                    </button> */}
                   </div>
 
                   {/* Size Selection */}

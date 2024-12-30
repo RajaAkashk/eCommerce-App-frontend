@@ -16,7 +16,7 @@ function Header() {
   return (
     <>
       <header>
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
+        <nav className="navbar navbar-expand-md bg-body-tertiary">
           <div className="container">
             <Link to="/" className="navbar-brand col-md-4 fs-5 fw-medium">
               MyShopSite
@@ -41,7 +41,7 @@ function Header() {
                 <li className="nav-item">
                   <Link className="nav-link" aria-current="page" to="/userPage">
                     <button className="btn btn-danger fw-medium text-light">
-                      <i class="bi bi-person-fill-check text-white me-1"></i>
+                      <i className="bi bi-person-fill-check text-white me-1"></i>
                       User 
                     </button>
                   </Link>

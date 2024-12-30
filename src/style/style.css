@@ -1,0 +1,174 @@
+.homePageCard {
+  object-fit: contain;
+  height: "15rem";
+  border-top-left-radius: 0.34rem;
+  border-bottom-left-radius: 0.34rem;
+}
+
+.homePageCardText {
+  margin-top: 1.5rem;
+}
+
+.orderSummaryBox {
+  width: 50vw;
+}
+
+/* from product details page  */
+.custom-px-5 {
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.custom-height {
+  height: 15rem;
+}
+
+.alertMessageDetailPage {
+  width: 78%;
+}
+
+/* Filters Section */
+
+.filter-toggle:focus {
+  color: red;
+}
+/* Filter Panel */
+.filter-panel {
+  display: block;
+}
+
+.filter-panel form {
+  display: flex;
+  flex-direction: column;
+}
+
+.filter-panel label {
+  margin-bottom: 10px;
+}
+
+.filter-panel button {
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.alertMessageProductPage {
+  position: fixed;
+  top: 0;
+  left: 65%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  width: 45rem;
+  margin-top: 5rem;
+}
+
+.alertMessageProductCartPage {
+  width: 50%;
+  left: 28rem;
+  z-index: 9999;
+}
+
+/* user Profile photo*/
+.userProfile {
+  width: 9.9rem;
+  height: 9.9rem;
+  object-fit: cover;
+}
+
+/* for mobile  */
+@media (max-width: 660px) {
+  .homePageCard {
+    object-fit: cover;
+    border-radius: 0.4rem 0.4rem 0 0;
+  }
+  .homePageCardText {
+    margin-top: 0px;
+  }
+
+  .custom-px-5 {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .custom-height {
+    height: 100%;
+  }
+
+  .userProfile {
+    width: 9.9rem !important;
+    height: 9.9rem !important;
+    margin: 0 auto !important;
+  }
+
+  .orderSummaryBox {
+    width: 100%;
+  }
+
+  /* Filter box */
+  .filter-panel {
+    display: none;
+  }
+
+  .filter-panel.open {
+    display: block; /* Show filters when 'open' class is added */
+  }
+
+  .filter-toggle {
+    display: block; /* Ensure the toggle button is visible on mobile */
+    position: relative; /* Ensure it's not hidden behind other elements */
+    z-index: 10; /* Bring it above other content */
+  }
+
+  .alertMessageProductPage,
+  .alertMessageProductCartPage {
+    width: 85% !important;
+    left: 5% !important;
+    transform: translate(0);
+  }
+
+  .alertMessageWishlistPage {
+    position: fixed;
+    top: 7px;
+    left: 5%;
+    transform: translateX(0);
+    z-index: 9999;
+    width: 90vw;
+    margin-top: 5rem;
+  }
+
+  /* searchBar from header2 */
+  .searchBar {
+    padding: 1rem 0 0 0;
+  }
+}
+
+@media (max-width: 900px) {
+  .userProfile {
+    margin: 0 auto !important;
+  }
+}
+
+@media (max-width: 1200px) {
+  .homePageCard {
+    height: 100%;
+    object-fit: cover;
+  }
+  .homePageCardText {
+    margin-top: 0px;
+  }
+  .alertMessageProductPage {
+    left: 54%;
+    width: 82vw;
+  }
+
+  .alertMessageProductCartPage {
+    width: 68vw;
+    left: 8rem;
+    z-index: 9999;
+  }
+
+  .alertMessageDetailPage {
+    width: 78%;
+    left: 13vw;
+  }
+}

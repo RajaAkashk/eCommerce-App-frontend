@@ -100,7 +100,7 @@ const WishlistPage = () => {
             {/*********************** alerts  ***********************/}
             {(showAlert || addCartMesssage || removeCartMesssage) && (
               <div
-                className="absolute top-20 alert alert-success text-center"
+                className="alertMessageWishlistPage absolute top-20 alert alert-success text-center"
                 role="alert"
               >
                 <span className="fs-5 fw-medium">
@@ -117,7 +117,7 @@ const WishlistPage = () => {
 
             {wishlist.length > 0
               ? wishlist.map((data) => (
-                  <div key={data.productInfo._id} className="col-md-3">
+                  <div key={data.productInfo._id} className="col-md-4 col-lg-4 col-xl-3">
                     <div
                       className="card position-relative mb-4"
                       style={{ borderRadius: "0px" }}
@@ -138,10 +138,9 @@ const WishlistPage = () => {
                       <Link to={`/productsPage/${data.productInfo._id}`}>
                         <img
                           src={data.productInfo.productImg}
-                          className="card-img-top"
+                          className="card-img-top custom-height"
                           alt="Clothing Image"
                           style={{
-                            height: "15rem",
                             objectFit: "cover",
                             borderRadius: "0px",
                           }}

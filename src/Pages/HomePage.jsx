@@ -101,8 +101,8 @@ function HomePage() {
                   <div className="col-md-4">
                     <img
                       src="https://plus.unsplash.com/premium_photo-1677553954020-68ac75b4e1b4?q=80&w=1933&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                      class="img-fluid rounded-start"
-                      style={{ objectFit: "contain", height: "15rem" }}
+                      className="img-fluid homePageCard"
+                      // style={{height: "15rem" }}
                       alt="New Men Clothes"
                     />
                   </div>
@@ -114,13 +114,12 @@ function HomePage() {
                       >
                         New Arrivals
                       </p>
-                      <p className="card-text mt-4">
+                      <p className="card-text homePageCardText">
                         Upgrade your wardrobe with our fresh arrivals—featuring
                         on-trend styles, quality fabrics, and designs that make
                         a statement. Shop now to stay sharp and stylish this
                         season.
                       </p>
-                      {/* <p className="card-text"><small className="text-body-secondary">Last updated 3 mins ago</small></p> */}
                     </div>
                   </div>
                 </div>
@@ -133,8 +132,8 @@ function HomePage() {
                   <div className="col-md-4">
                     <img
                       src="https://images.unsplash.com/photo-1727475931105-2f6ffa51ad6d?q=80&w=1964&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-                      class="img-fluid rounded-start"
-                      style={{ objectFit: "contain", height: "15rem" }}
+                      className="img-fluid homePageCard"
+                      // style={{ objectFit: "contain", height: "15rem" }}
                       alt="New Women Clothes"
                     />
                   </div>
@@ -146,13 +145,12 @@ function HomePage() {
                       >
                         New Arrivals
                       </p>
-                      <p className="card-text mt-4">
+                      <p className="card-text homePageCardText">
                         Elevate your style with our latest collection, blending
                         chic designs, premium fabrics, and must-have pieces for
                         every occasion. Discover your new favorite looks and
                         shine this season.
                       </p>
-                      {/* <p className="card-text"><small className="text-body-secondary">Last updated 3 mins ago</small></p> */}
                     </div>
                   </div>
                 </div>

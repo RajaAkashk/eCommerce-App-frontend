@@ -99,7 +99,7 @@ function UserPage() {
       <Header />
       <main className="container py-5">
         <div className="row justify-content-between">
-          <div className="col-md-6">
+          <div className="col-md-12 col-lg-6">
             <div className="card mb-3">
               <div className="row g-0 py-2 px-4">
                 {loading ? (
@@ -111,8 +111,11 @@ function UserPage() {
                 ) : (
                   <>
                     {userInfo?.map((user, index) => (
-                      <>
-                        <div className="col-md-4 d-flex align-items-center">
+                      <div
+                        key={index}
+                        className="d-flex align-items-center flex-wrap"
+                      >
+                        <div className="col-md-4 userProfile">
                           <img
                             src={`${user.profile}`}
                             style={{
@@ -120,7 +123,7 @@ function UserPage() {
                               height: "9.9rem",
                               objectFit: "cover",
                             }}
-                            className="img-fluid rounded-circle"
+                            className="img-fluid rounded-circle "
                             alt="User Profile"
                           />
                         </div>
@@ -141,14 +144,17 @@ function UserPage() {
                             </p>
                           </div>
                         </div>
-                      </>
+                      </div>
                     ))}
                   </>
                 )}
-                <div className="mt-4 text-center">
+                <div className="mt-lg-4 text-center">
                   <h2 className="m-0 p-0">Choose one Address</h2>
                   {(deleteMessage || updateMessage) && (
-                    <div class="alert alert-success text-center" role="alert">
+                    <div
+                      className="alert alert-success text-center"
+                      role="alert"
+                    >
                       <span className="fs-5">
                         {deleteMessage && "Successfully Deleted Address"}
                         {updateMessage && "New Address Added"}
@@ -189,7 +195,7 @@ function UserPage() {
                             />
                             <span className="mt-2">{`${data.houseNumber}, ${data.street}, ${data.city}, ${data.state}, ${data.zipcode}`}</span>
                             <button
-                              className="btn btn-danger"
+                              className="btn btn-danger ms-2"
                               onClick={() => deleteAddressHandler(data._id)}
                             >
                               Delete
@@ -204,12 +210,12 @@ function UserPage() {
             </div>
           </div>
 
-          <div className="col-md-6">
+          <div className="col-md-12 col-lg-6">
             <div className="border rounded p-4">
               <h1 className="mb-4 text-center">Add Address</h1>
               <form onSubmit={addressFormHandler}>
                 {alert && (
-                  <div class="alert alert-success text-center" role="alert">
+                  <div className="alert alert-success text-center" role="alert">
                     <span className="fs-5">New Address Added !</span>
                   </div>
                 )}
