@@ -24,7 +24,7 @@ function ProductPage() {
   const [newStore, setNewStore] = useState([]);
   const [cartStoreData, setCartStoreData] = useState([]);
   const [cartStore, setCartStore] = useState([]);
-
+  const [isOpen, setIsOpen] = useState(false);
   // contexts
   const { wishlist, addToWishlist, removeFromWishlist } =
     useContext(WishlistContext);
@@ -65,7 +65,7 @@ function ProductPage() {
 
   // Handle search term and filter products
   const handleSearch = (searchTerm) => {
-    if (searchTerm === "") {
+    if (searchTerm == "") {
       setProductsData(productsData);
     } else {
       const filtered = productDataCopy.filter((product) =>
@@ -108,10 +108,10 @@ function ProductPage() {
   console.log("newStore wishlist data id same as product id:-", newStore);
 
   useEffect(() => {
-    if (cartList) {
-      console.log("set Cart Store:---", cartList);
-      setCartStoreData(cartList);
-    }
+    // if (cartList) {
+    console.log("set Cart Store:---", cartList);
+    setCartStoreData(cartList);
+    // }
   }, [cartList]);
   console.log("cartStore:---", cartStoreData);
 
@@ -264,6 +264,10 @@ function ProductPage() {
     setTimeout(() => setAddCartMesssage(false), 1000);
   };
 
+  function toggleFilters() {
+    setIsOpen(!isOpen);
+  }
+
   //****************** products page ******************
   return (
     <>
@@ -272,27 +276,38 @@ function ProductPage() {
         <div className="container-fluid">
           <div className="row">
             {/************* filters section  *************/}
-            <div className="col-md-3 bg-light">
-              <div className="container py-4">
-                <div className="d-flex justify-content-between">
-                  <h3>Filters</h3>
-                  <button
-                    onClick={clearAllFilters}
-                    className="fs-5 fw-normal"
-                    onMouseEnter={handleMouseEnter}
-                    onMouseLeave={handleMouseLeave}
-                    style={{
-                      color: isHovered ? "red" : "black",
-                      textDecoration: "underline",
-                      border: "none",
-                      background: "none",
-                    }}
-                  >
-                    Clear
-                  </button>
-                </div>
-                <br />
 
+            <div className="col-md-3 bg-light py-3">
+              <div className="d-flex justify-content-between">
+                <button
+                  className="filter-toggle fs-3 fw-medium"
+                  onClick={toggleFilters}
+                  style={{
+                    // textDecoration: "underline",
+                    border: "none",
+                    background: "none",
+                  }}
+                >
+                  Filters
+                </button>
+                <button
+                  onClick={clearAllFilters}
+                  className="fs-5 fw-normal"
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                  style={{
+                    color: isHovered ? "red" : "black",
+                    // textDecoration: "underline",
+                    border: "none",
+                    padding: "0px",
+                    background: "none",
+                  }}
+                >
+                  Clear
+                </button>
+              </div>
+
+              <div className={`pt-2 filter-panel ${isOpen ? "open" : ""}`}>
                 <div>
                   <label htmlFor="category" className="fs-4 fw-medium">
                     Category
@@ -304,7 +319,7 @@ function ProductPage() {
                     name="category"
                     className="me-1 form-check-input"
                     value="All"
-                    checked={category == "All" ? true : false}
+                    checked={category === "All"}
                   />
                   All <br />
                   <input
@@ -313,7 +328,7 @@ function ProductPage() {
                     name="category"
                     className="me-1 form-check-input"
                     value="Men"
-                    checked={category == "Men" ? true : false}
+                    checked={category === "Men"}
                   />
                   Men <br />
                   <input
@@ -322,7 +337,7 @@ function ProductPage() {
                     name="category"
                     className="me-1 form-check-input"
                     value="Women"
-                    checked={category == "Women" ? true : false}
+                    checked={category === "Women"}
                   />
                   Women <br />
                   <input
@@ -331,24 +346,27 @@ function ProductPage() {
                     name="category"
                     className="me-1 form-check-input"
                     value="Kids"
-                    checked={category == "Kids" ? true : false}
+                    checked={category === "Kids"}
                   />
                   Kids
                   <br />
                 </div>
                 <br />
-                <label for="customRange3" class="fs-4 fw-medium">
+                <label htmlFor="customRange3" className="fs-4 fw-medium">
                   Price Range:
                 </label>
-                <p className="m-0 ms-2">
+                <div
+                  style={{ width: "86%" }}
+                  className="m-0 ms-2 d-flex justify-content-between"
+                >
                   {" "}
-                  <span className="me-4 fs-5"> ₹ 1K</span>{" "}
-                  <span className="mx-5 fs-5">₹ 4K</span>{" "}
-                  <span className="mx-4 fs-5">₹ 6K</span>{" "}
-                </p>
+                  <span className="fs-5"> ₹ 1K</span>{" "}
+                  <span className="fs-5">₹ 4K</span>{" "}
+                  <span className="fs-5">₹ 6K</span>{" "}
+                </div>
                 <input
                   type="range"
-                  class="form-range"
+                  className="form-range"
                   onChange={rangeHandler}
                   value={productPrice}
                   min="1000"
@@ -371,11 +389,11 @@ function ProductPage() {
                     checked={requiredRating == 5}
                     onChange={productsRatingHandler}
                   />
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i> <br />
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i> <br />
                   <input
                     type="radio"
                     name="rating"
@@ -384,10 +402,10 @@ function ProductPage() {
                     checked={requiredRating == 4}
                     onChange={productsRatingHandler}
                   />
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i> <br />
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i> <br />
                   <input
                     type="radio"
                     name="rating"
@@ -396,9 +414,9 @@ function ProductPage() {
                     checked={requiredRating == 3}
                     onChange={productsRatingHandler}
                   />
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i> <br />
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i> <br />
                   <input
                     type="radio"
                     name="rating"
@@ -407,8 +425,8 @@ function ProductPage() {
                     checked={requiredRating == 2}
                     onChange={productsRatingHandler}
                   />
-                  <i class="bi bi-star-fill text-warning"></i>{" "}
-                  <i class="bi bi-star-fill text-warning"></i> <br />
+                  <i className="bi bi-star-fill text-warning"></i>{" "}
+                  <i className="bi bi-star-fill text-warning"></i> <br />
                   <input
                     type="radio"
                     name="rating"
@@ -417,7 +435,7 @@ function ProductPage() {
                     checked={requiredRating == 1}
                     onChange={productsRatingHandler}
                   />
-                  <i class="bi bi-star-fill text-warning"></i> <br />
+                  <i className="bi bi-star-fill text-warning"></i> <br />
                 </div>
                 <br />
                 <div>
@@ -430,7 +448,7 @@ function ProductPage() {
                     name="sortBy"
                     className="me-1 form-check-input"
                     value="Low to High"
-                    checked={sortOptionValue == "Low to High"}
+                    checked={sortOptionValue === "Low to High"}
                     onChange={SortPrice}
                   />
                   Price - Low to High
@@ -440,7 +458,7 @@ function ProductPage() {
                     name="sortBy"
                     className="me-1 form-check-input"
                     value="High to Low"
-                    checked={sortOptionValue == "High to Low"}
+                    checked={sortOptionValue === "High to Low"}
                     onChange={SortPrice}
                   />
                   Price - High to Low <br />
@@ -449,7 +467,7 @@ function ProductPage() {
             </div>
 
             {/******************************* content side  *******************************/}
-            <div className="col-md-9 ">
+            <div className="col-md-9">
               <div className="container py-4">
                 {/***************** Alerts *****************/}
                 {(alertMessage ||
@@ -457,16 +475,7 @@ function ProductPage() {
                   addCartMesssage ||
                   showAlert) && (
                   <div
-                    className="alert alert-success text-center"
-                    style={{
-                      position: "fixed",
-                      top: "0",
-                      left: "65%",
-                      transform: "translateX(-50%)",
-                      zIndex: "9999",
-                      width: "45rem",
-                      marginTop: "5rem",
-                    }}
+                    className="alert alert-success text-center alertMessageProductPage"
                     role="alert"
                   >
                     <span className="fs-5 fw-medium">
@@ -485,12 +494,15 @@ function ProductPage() {
 
                 {/**************** All the products ****************/}
                 {productsData ? (
-                  <>
+                  <div className="">
                     <h2>All Products</h2>
                     <div className="row py-3">
                       {/***************** map to display data  *****************/}
                       {productsData.map((data) => (
-                        <div key={data._id} className="col-md-4">
+                        <div
+                          key={data._id}
+                          className="col-md-6 col-lg-6 col-xl-4"
+                        >
                           <div
                             className="card position-relative mb-4"
                             style={{ borderRadius: "0px" }}
@@ -563,7 +575,7 @@ function ProductPage() {
                         </div>
                       ))}
                     </div>
-                  </>
+                  </div>
                 ) : (
                   loading && (
                     <div

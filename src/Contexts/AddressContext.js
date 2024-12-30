@@ -32,6 +32,7 @@ const AddressContextProvider = ({ children }) => {
       setUserInfo(data.user);
     } catch (error) {
       console.log("Failed to get data from database.");
+      
     }
   };
 

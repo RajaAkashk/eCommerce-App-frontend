@@ -1,6 +1,6 @@
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import useFetch from "../useFetch";
 import { useEffect, useState, useContext } from "react";
 import StarRating from "../Components/StarRating";
@@ -101,26 +101,6 @@ function ProductDetailsPage() {
     setTimeout(() => setAddCartAlert(false), 1000);
   };
 
-  //***********  show more products ***********
-  console.log("productData category:-", productData.category);
-  const {
-    data: moreProductsData,
-    loading: moreLoading,
-    error: moreError,
-  } = useFetch(
-    `https://e-commerce-app-backend-seven.vercel.app/products/category/${productData.category}`
-  );
-  useEffect(() => {
-    if (moreProductsData) {
-      console.log("moreProductsData:", moreProductsData.products);
-      setMoreProducts(moreProductsData.products);
-    }
-  }, [moreProductsData]);
-
-  console.log("moreProducts:-", moreProducts);
-
-
-
   // Update product Size
   const updateProductSize = (selectedSize) => {
     console.log("updateProductSize ;-", selectedSize);
@@ -133,7 +113,7 @@ function ProductDetailsPage() {
     }, 1000);
   };
 
-  if (error || moreError) {
+  if (error) {
     <div
       className="d-flex justify-content-center align-items-center"
       style={{ height: "100vh" }}
@@ -154,9 +134,8 @@ function ProductDetailsPage() {
           addCartAlert ||
           sizeChangeAlert) && (
           <div
-            className="position-absolute top-3 alert alert-success text-center"
+            className="position-absolute top-3 alert alert-success text-center alertMessageDetailPage"
             role="alert"
-            style={{ width: "78%" }}
           >
             <span className="fs-5 fw-medium">
               {alertMessage
@@ -231,7 +210,7 @@ function ProductDetailsPage() {
                 </div>
 
                 {/* Product Details */}
-                <div className="col-md-8 px-5">
+                <div className="col-md-8 custom-px-5">
                   <h1>{productData.name}</h1>
                   <div className="pt-2">
                     <StarRating rating={productData.rating} />
@@ -244,18 +223,6 @@ function ProductDetailsPage() {
                     <span className=" border px-3 py-1 rounded bg-light fw-medium">
                       {quantity}
                     </span>
-                    {/* <button
-                      className="rounded bg-light"
-                      onClick={() => handleIncrement(productData)}
-                    >
-                      <i className="bi bi-plus"></i>
-                    </button> */}
-                    {/* <button
-                      className="rounded bg-light"
-                      onClick={() => handleDecrement(productData)}
-                    >
-                      <i className="bi bi-dash"></i>
-                    </button> */}
                   </div>
 
                   {/* Size Selection */}
@@ -319,8 +286,9 @@ function ProductDetailsPage() {
       )}
 
       {/* more products  */}
+     
 
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }

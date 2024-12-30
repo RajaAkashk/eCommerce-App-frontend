@@ -182,7 +182,6 @@ const ProductCartPage = () => {
     }
   };
 
-
   return (
     <>
       <Header />
@@ -195,9 +194,8 @@ const ProductCartPage = () => {
             alertForQuantityIncrease ||
             alertForQuantityDecrease) && (
             <div
-              className="alert alert-success text-center position-fixed  top-1"
+              className="alert alert-success text-center position-fixed  top-1  alertMessageProductCartPage"
               role="alert"
-              style={{ width: "50%", zIndex: "9999", left: "28rem" }}
             >
               <span className="fs-5 fw-medium">
                 {alertMessage
@@ -213,7 +211,7 @@ const ProductCartPage = () => {
             </div>
           )}
 
-          <div className="row px-5">
+          <div className="row">
             <div className="col-md-7">
               {/******************** Display Cart Data ********************/}
               {cartListData.length != 0 ? (
@@ -227,7 +225,7 @@ const ProductCartPage = () => {
                             <Link to={`/productsPage/${data.productInfo._id}`}>
                               <img
                                 src={data.productInfo.productImg}
-                                className="img-fluid rounded-start"
+                                className="img-fluid homePageCard"
                                 alt="Clothing Image"
                                 style={{
                                   height: "100%",
@@ -312,7 +310,7 @@ const ProductCartPage = () => {
                                 className="my-2 btn btn-secondary text-light w-100 fs-5 fw-medium"
                                 style={{ borderRadius: "0px" }}
                               >
-                                {newStore.find((prod) => prod === data._id)
+                                {newStore.includes(data.productInfo._id)
                                   ? "Remove From Wishlist"
                                   : "Add To Wishlist"}
                               </button>
@@ -348,7 +346,7 @@ const ProductCartPage = () => {
               )}
             </div>
             <div className="col-md-5">
-              <div className="border rounded text-center p-5">
+              <div className="border rounded text-center p-4">
                 <h1 style={{ fontSize: "2.3rem" }}>
                   Total Product ({totalProducts})
                 </h1>

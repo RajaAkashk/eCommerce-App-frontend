@@ -21,7 +21,7 @@ function CheckoutPage() {
 
   const finalMessageHandler = () => {
     setMessage(true);
-    alert("Information regarding order will be sent to you email address.");
+    // alert("Information regarding order will be sent to you email address.");
   };
 
   useEffect(() => {
@@ -31,8 +31,8 @@ function CheckoutPage() {
   return (
     <>
       <Header />
-      <main className="d-flex justify-content-center p-5">
-        <div className="border p-4 rounded border-2" style={{ width: "50vw" }}>
+      <main className="container d-flex justify-content-center py-5 ">
+        <div className="border p-4 rounded border-2 orderSummaryBox">
           {/* Show confirmation message or order summary */}
           {message ? (
             <div className="text-center">
@@ -47,7 +47,7 @@ function CheckoutPage() {
             </div>
           ) : (
             <>
-              <h1 className="text-center display-5 mb-4 pb-4 text-danger border-bottom border-danger">
+              <h1 className="text-center display-5 mb-4 pb-lg-4 text-danger border-bottom border-danger">
                 Order Summary
               </h1>
 
@@ -80,7 +80,7 @@ function CheckoutPage() {
                 </p>
                 <p className="fs-5">
                   <strong>Total price of items: </strong>
-                  <i class="bi bi-currency-rupee"></i>
+                  <i className="bi bi-currency-rupee"></i>
                   {totalPrice}
                   {totalPrice > 5000 ? (
                     <span className="fs-5 fw-medium text-success mx-2">
@@ -90,20 +90,19 @@ function CheckoutPage() {
                   ) : (
                     <span className="fs-5">
                       <strong> +</strong> Delivery charges(
-                      <i class="bi bi-currency-rupee"></i>200)
+                      <i className="bi bi-currency-rupee"></i>200)
                       <br />
                     </span>
                   )}
                 </p>
                 {totalPrice < 5000 && (
-                  <>                   
+                  <>
                     <p className="fs-5">
                       <span>
                         {" "}
-                        <strong className="">
-                         Sub Total:{" "}
-                        </strong>{" "}
-                        <i class="bi bi-currency-rupee"></i>{totalPrice + 200}
+                        <strong className="">Sub Total: </strong>{" "}
+                        <i className="bi bi-currency-rupee"></i>
+                        {totalPrice + 200}
                       </span>
                     </p>
                   </>
