@@ -21,7 +21,7 @@ function CheckoutPage() {
 
   const finalMessageHandler = () => {
     setMessage(true);
-    alert("Information regarding order will be sent to you email address.");
+    // alert("Information regarding order will be sent to you email address.");
   };
 
   useEffect(() => {
