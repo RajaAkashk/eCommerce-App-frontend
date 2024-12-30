@@ -146,7 +146,7 @@ function ProductDetailsPage() {
     <>
       <Header />
       <div className="container pt-2">
-        {(!alertMessage ||
+        {(alertMessage ||
           showAlert ||
           deleteAlert ||
           addCartAlert ||
