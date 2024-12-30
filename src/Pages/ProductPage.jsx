@@ -65,7 +65,7 @@ function ProductPage() {
 
   // Handle search term and filter products
   const handleSearch = (searchTerm) => {
-    if (searchTerm === "") {
+    if (searchTerm == "") {
       setProductsData(productsData);
     } else {
       const filtered = productDataCopy.filter((product) =>
@@ -499,7 +499,10 @@ function ProductPage() {
                     <div className="row py-3">
                       {/***************** map to display data  *****************/}
                       {productsData.map((data) => (
-                        <div key={data._id} className="col-md-6 col-lg-6 col-xl-4">
+                        <div
+                          key={data._id}
+                          className="col-md-6 col-lg-6 col-xl-4"
+                        >
                           <div
                             className="card position-relative mb-4"
                             style={{ borderRadius: "0px" }}

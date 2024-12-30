@@ -1,6 +1,6 @@
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import useFetch from "../useFetch";
 import { useEffect, useState, useContext } from "react";
 import StarRating from "../Components/StarRating";
@@ -101,24 +101,6 @@ function ProductDetailsPage() {
     setTimeout(() => setAddCartAlert(false), 1000);
   };
 
-  //***********  show more products ***********
-  // console.log("productData category:-", productData.category);
-  // const {
-  //   data: moreProductsData,
-  //   loading: moreLoading,
-  //   error: moreError,
-  // } = useFetch(
-  //   `https://e-commerce-app-backend-seven.vercel.app/products/category/${productData.category}`
-  // );
-  // useEffect(() => {
-  //   if (moreProductsData) {
-  //     console.log("moreProductsData:", moreProductsData.products);
-  //     setMoreProducts(moreProductsData.products);
-  //   }
-  // }, [moreProductsData]);
-
-  // console.log("moreProducts:-", moreProducts);
-
   // Update product Size
   const updateProductSize = (selectedSize) => {
     console.log("updateProductSize ;-", selectedSize);
@@ -171,7 +153,7 @@ function ProductDetailsPage() {
       </div>
       {data ? (
         <>
-          <section className="py-4 vh-100">
+          <section className="py-4">
             <div className="container bg-white">
               <div className="row p-4 py-5">
                 {/* Product Image and Actions */}
@@ -304,8 +286,9 @@ function ProductDetailsPage() {
       )}
 
       {/* more products  */}
+     
 
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
