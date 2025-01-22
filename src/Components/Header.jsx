@@ -19,7 +19,7 @@ function Header() {
         <nav className="navbar navbar-expand-md bg-body-tertiary">
           <div className="container">
             <Link to="/" className="navbar-brand col-md-4 fs-5 fw-medium">
-              MyShopSite
+              TrendHive
             </Link>
             <button
               className="navbar-toggler"
@@ -36,14 +36,10 @@ function Header() {
               className="collapse navbar-collapse"
               id="navbarSupportedContent"
             >
-            
               <ul className="navbar-nav ms-auto mb-2 mb-lg-0">
                 <li className="nav-item">
-                  <Link className="nav-link" aria-current="page" to="/userPage">
-                    <button className="btn btn-danger fw-medium text-light">
-                      <i className="bi bi-person-fill-check text-white me-1"></i>
-                      User 
-                    </button>
+                  <Link className="nav-link p-0" aria-current="page" to="/userPage">
+                    <i className="bi bi-person-fill-check text-danger fs-2"></i>
                   </Link>
                 </li>
                 <li className="nav-item ms-2">
