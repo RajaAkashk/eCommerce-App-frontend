@@ -7,10 +7,16 @@ import { Link } from "react-router-dom";
 
 function CheckoutPage() {
   const [message, setMessage] = useState(false);
+  const [ChoosenAddress, setAddress] = useState("");
 
-  const { userInfo, getUserInfo } = useContext(AddressContext);
+  const { userInfo, getUserInfo, getAllAddress, address, updateUserAddress } =
+    useContext(AddressContext);
+  const { cartList, deleteAllProductsFromCart } = useContext(CartContext);
 
-  const { cartList } = useContext(CartContext);
+  useEffect(() => {
+    getUserInfo();
+    getAllAddress();
+  }, [getUserInfo, getAllAddress]);
 
   const totalPrice = cartList.reduce(
     (acc, curr) =>
@@ -19,14 +25,30 @@ function CheckoutPage() {
     0
   );
 
-  const finalMessageHandler = () => {
+  const finalMessageHandler = async () => {
     setMessage(true);
-    // alert("Information regarding order will be sent to you email address.");
+    try {
+      await deleteAllProductsFromCart(); // Assuming this is async
+      // alert(
+      //   "Cart has been cleared. Information regarding your order will be sent to your email."
+      // );
+    } catch (error) {
+      alert("Failed to clear the cart. Please try again.");
+    }
   };
 
-  useEffect(() => {
-    getUserInfo();
-  }, [getUserInfo]);
+  const updateUserAddressHandler = (e) => {
+    const updatedAddress = e.target.value;
+    console.log("updated Address :-", updatedAddress);
+
+    const userId = userInfo[0]._id;
+    console.log("USER ID :-", userId);
+    updateUserAddress(userId, updatedAddress);
+
+    setAddress(updatedAddress);
+    // setUpdateMessage(true);
+    // setTimeout(() => setUpdateMessage(false), 1000);
+  };
 
   return (
     <>
@@ -65,11 +87,48 @@ function CheckoutPage() {
                     <p className="fs-5">
                       <strong>Number: </strong> (+91) {data.phoneNumber}
                     </p>
-                    <p className="fs-5">
+                    {/* <p className="fs-5">
                       <strong>Shipping Address: </strong> {data.address}
-                    </p>
+                    </p> */}
                   </div>
                 ))}
+                {/* for selecting an address  */}
+                <label className="fs-5 fw-bold" htmlFor="selectAddress">
+                  Select one shipping address:
+                </label>
+                <select
+                  id="selectAddress"
+                  className="form-select my-3"
+                  name="address"
+                  value={ChoosenAddress}
+                  onChange={updateUserAddressHandler}
+                >
+                  {address.length === 0 ? (
+                    <option>
+                      <div className="text-center">
+                        <div
+                          className="spinner-border text-danger"
+                          role="status"
+                        >
+                          <span className="visually-hidden">Loading...</span>
+                        </div>
+                      </div>
+                    </option>
+                  ) : (
+                    <>
+                      <option value="">Select</option>
+                      {address.map((data) => (
+                        <option
+                          key={data._id}
+                          value={`${data.houseNumber}, ${data.street}, ${data.city}, ${data.state}, ${data.zipcode}`}
+                        >
+                          {`${data.houseNumber}, ${data.street}, ${data.city}, ${data.state}, ${data.zipcode}`}
+                        </option>
+                      ))}
+                    </>
+                  )}
+                </select>
+
                 <p className="fs-5">
                   <strong>Total items to be delivered: </strong>
                   {cartList.reduce(
@@ -119,7 +178,14 @@ function CheckoutPage() {
               <div className="d-flex justify-content-center">
                 <button
                   className="btn btn-danger fs-5"
-                  onClick={finalMessageHandler}
+                  onClick={() => {
+                    if (ChoosenAddress === "") {
+                      alert("Please select one address");
+                    } else {
+                      finalMessageHandler();
+                    }
+                  }}
+                  disabled={ChoosenAddress === ""}
                 >
                   Checkout
                 </button>

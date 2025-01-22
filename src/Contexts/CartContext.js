@@ -82,12 +82,31 @@ const CartProvider = ({ children }) => {
     }
   };
 
+  const deleteAllProductsFromCart = async () => {
+    try {
+      const response = await fetch(
+        "https://e-commerce-app-backend-seven.vercel.app/cart/products/delete/all",
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) {
+        console.log("Error in deleting all the products from cart.");
+      } else {
+        setCartList([]);
+      }
+    } catch (error) {
+      console.log("Failed to delete all products from cart.", error);
+    }
+  };
+
   return (
     <CartContext.Provider
       value={{
         cartList,
         addProductToCart,
         deleteProductFromCart,
+        deleteAllProductsFromCart,
         loading,
         error,
         updatedTheFetchData,
