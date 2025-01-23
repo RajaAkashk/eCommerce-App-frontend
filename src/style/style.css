@@ -13,6 +13,10 @@
   width: 50vw;
 }
 
+#clearFilterBtn:hover {
+  color: #dc3545;
+}
+
 /* from product details page  */
 .custom-px-5 {
   padding-left: 3rem;
