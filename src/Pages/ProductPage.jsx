@@ -13,6 +13,9 @@ function ProductPage() {
   const [productDataCopy, setProductDataCopy] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState("");
 
+  const [allProducts, setAllProducts] = useState([]);
+  const [categoryArray, setCategoryArray] = useState([]);
+
   // filters
   const [productPrice, setProductPrice] = useState("");
   const [requiredRating, setRequiredRating] = useState("");
@@ -40,11 +43,14 @@ function ProductPage() {
 
   const { productCategory } = useParams();
   // to store value a selected category
-  let category;
-  selectedCategory
-    ? (category = selectedCategory)
-    : (category = productCategory);
-
+  let category = productCategory;
+  useEffect(() => {
+    if (productCategory) {
+      setCategoryArray((prev) => [...prev, productCategory]);
+      console.log("Category added:", productCategory);
+      console.log("setCategoryArray:", categoryArray);
+    }
+  }, [productCategory]);
   console.log("category-", category);
 
   const categoryUrl = `https://e-commerce-app-backend-seven.vercel.app/products/category/${category}`;
@@ -58,6 +64,7 @@ function ProductPage() {
   useEffect(() => {
     if (data) {
       console.log("CATEGORY DATA:", data.products);
+      console.log("CATEGORY CAll:", category);
       setProductsData(data.products);
       setProductDataCopy(data.products);
     }
@@ -108,10 +115,8 @@ function ProductPage() {
   console.log("newStore wishlist data id same as product id:-", newStore);
 
   useEffect(() => {
-    // if (cartList) {
     console.log("set Cart Store:---", cartList);
     setCartStoreData(cartList);
-    // }
   }, [cartList]);
   console.log("cartStore:---", cartStoreData);
 
@@ -163,17 +168,6 @@ function ProductPage() {
   // For clear btn hover
   const handleMouseEnter = () => setIsHovered(true);
   const handleMouseLeave = () => setIsHovered(false);
-
-  //Clothing category Handler
-  const navigate = useNavigate();
-
-  const categoryHandler = (event) => {
-    const { value } = event.target;
-    setSelectedCategory(value);
-    navigate(`/products/${value}`);
-    clearAllFilters(); // all filter also back to default.
-  };
-  console.log("selectedCategory-", selectedCategory);
 
   //Price range Handler
   const rangeHandler = (event) => {
@@ -268,6 +262,73 @@ function ProductPage() {
     setIsOpen(!isOpen);
   }
 
+  // CATEGORY HANDLE FETCH CALL
+
+  // fetch all products for category
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          console.log(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log("Fetched Data For all Products:", data);
+        // Process or display the data as needed
+        setAllProducts(data.products);
+      } catch (error) {
+        console.log("Error fetching data:", error.message);
+      }
+    }
+
+    fetchData();
+  }, []);
+  const navigate = useNavigate();
+  //Clothing category Handler
+
+  const categoryHandler = (event) => {
+    const { value, checked } = event.target;
+
+    let updatedCategoryArray;
+
+    if (value === "All") {
+      updatedCategoryArray = checked ? ["All"] : [];
+    } else {
+      updatedCategoryArray = checked
+        ? [...categoryArray, value]
+        : categoryArray.filter((categoryData) => categoryData !== value);
+
+      // If "All" is already in the array and a category is deselected, remove "All"
+      if (updatedCategoryArray.includes("All") && !checked) {
+        updatedCategoryArray = updatedCategoryArray.filter(
+          (categoryData) => categoryData !== "All"
+        );
+      }
+    }
+
+    setCategoryArray(updatedCategoryArray); // Update the state
+
+    // Update products based on the updated category array
+    if (
+      updatedCategoryArray.length === 0 ||
+      updatedCategoryArray.includes("All")
+    ) {
+      // If no categories are selected or "All" is selected, show all products
+      setProductsData(allProducts);
+    } else {
+      // Otherwise, filter products based on selected categories
+      setProductsData(
+        allProducts.filter((data) =>
+          updatedCategoryArray.includes(data.category)
+        )
+      );
+    }
+
+    console.log("categoryArray", updatedCategoryArray);
+  };
+
+  console.log("selectedCategory-", selectedCategory);
+
   //****************** products page ******************
   return (
     <>
@@ -319,7 +380,7 @@ function ProductPage() {
                     name="category"
                     className="me-1 form-check-input"
                     value="All"
-                    checked={category === "All"}
+                    checked={categoryArray.includes("All")}
                   />
                   All <br />
                   <input
@@ -328,7 +389,7 @@ function ProductPage() {
                     name="category"
                     className="me-1 form-check-input"
                     value="Men"
-                    checked={category === "Men"}
+                    checked={categoryArray.includes("Men")}
                   />
                   Men <br />
                   <input
@@ -337,7 +398,7 @@ function ProductPage() {
                     name="category"
                     className="me-1 form-check-input"
                     value="Women"
-                    checked={category === "Women"}
+                    checked={categoryArray.includes("Women")}
                   />
                   Women <br />
                   <input
@@ -346,7 +407,7 @@ function ProductPage() {
                     name="category"
                     className="me-1 form-check-input"
                     value="Kids"
-                    checked={category === "Kids"}
+                    checked={categoryArray.includes("Kids")}
                   />
                   Kids
                   <br />
