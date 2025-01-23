@@ -4,30 +4,17 @@ import { useState, useEffect, useContext } from "react";
 import useFetch from "../useFetch";
 import StarRating from "../Components/StarRating";
 import { Link, useParams, useNavigate } from "react-router-dom";
-
 import { WishlistContext } from "../Contexts/WishlistContext";
 import { CartContext } from "../Contexts/CartContext";
 
 function ProductPage() {
-  const [productsData, setProductsData] = useState([]);
-  const [productDataCopy, setProductDataCopy] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState("");
-
-  const [allProducts, setAllProducts] = useState([]);
-  const [categoryArray, setCategoryArray] = useState([]);
-
   // filters
-  const [productPrice, setProductPrice] = useState("");
-  const [requiredRating, setRequiredRating] = useState("");
-  const [sortOptionValue, setSortOptionValue] = useState("");
-
-  const [isHovered, setIsHovered] = useState(false);
-
   const [wishlistData, setWishlistData] = useState([]);
   const [newStore, setNewStore] = useState([]);
   const [cartStoreData, setCartStoreData] = useState([]);
   const [cartStore, setCartStore] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
+
   // contexts
   const { wishlist, addToWishlist, removeFromWishlist } =
     useContext(WishlistContext);
@@ -38,59 +25,123 @@ function ProductPage() {
   const [deleteAlert, setDeleteAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessageForWishlist, setAlertMessageForWishlist] = useState(false);
   const [addCartMesssage, setAddCartMesssage] = useState(false);
 
   const { productCategory } = useParams();
-  // to store value a selected category
-  let category = productCategory;
-  useEffect(() => {
-    if (productCategory) {
-      setCategoryArray((prev) => [...prev, productCategory]);
-      console.log("Category added:", productCategory);
-      console.log("setCategoryArray:", categoryArray);
-    }
-  }, [productCategory]);
-  console.log("category-", category);
+  console.log("productCategory", productCategory);
 
-  const categoryUrl = `https://e-commerce-app-backend-seven.vercel.app/products/category/${category}`;
-
-  const url = "https://e-commerce-app-backend-seven.vercel.app/products";
+  const [gender, setGender] = useState(
+    productCategory === "All" ? ["Men", "Women", "Kids"] : [productCategory]
+  );
+  const [rating, setRating] = useState("all");
+  const [range, setRange] = useState(0);
+  const [sorted, setSorted] = useState("none");
+  const [filteredData, setFilteredData] = useState([]);
+  const [allProducts, setAllProducts] = useState([]);
+  const [filterByGender, setFilterByGender] = useState([]);
 
   const { data, loading, error } = useFetch(
-    category !== "All" ? categoryUrl : url
+    "https://e-commerce-app-backend-seven.vercel.app/products"
   );
 
   useEffect(() => {
-    if (data) {
-      console.log("CATEGORY DATA:", data.products);
-      console.log("CATEGORY CAll:", category);
-      setProductsData(data.products);
-      setProductDataCopy(data.products);
+    if (productCategory === "All") {
+      setGender(["Men", "Women", "Kids"]);
+    } else {
+      setGender([productCategory]);
+    }
+  }, [productCategory]);
+
+  useEffect(() => {
+    if (data && data.products) {
+      setAllProducts(data.products);
+      setFilteredData(data.products);
     }
   }, [data]);
+
+  useEffect(() => {
+    filterData();
+  }, [gender, rating, range, sorted, allProducts]);
+
+  const filterData = () => {
+    let filtered = allProducts;
+
+    // Skip gender filter if productCategory is 'All'
+    if (gender.length > 0 && !gender.includes("All")) {
+      filtered = filtered.filter((prod) => gender.includes(prod.category));
+      setFilterByGender(filtered);
+    }
+
+    // Filter by rating
+    if (rating !== "all") {
+      filtered = filtered.filter((prod) => prod.rating >= parseInt(rating));
+    }
+
+    // Filter by price range
+    if (range !== 0) {
+      filtered = filtered.filter((prod) => prod.price >= range);
+    }
+
+    // Sort products
+    if (sorted === "lowToHigh") {
+      filtered = [...filtered].sort((a, b) => a.price - b.price);
+    } else if (sorted === "highToLow") {
+      filtered = [...filtered].sort((a, b) => b.price - a.price);
+    }
+
+    setFilteredData(filtered);
+  };
+
+  // TO get all values from Filter Form.
+  const genderFilter = (e) => {
+    const { value, checked } = e.target;
+    setGender((prev) =>
+      checked ? [...prev, value] : prev.filter((item) => item !== value)
+    );
+  };
+
+  const ratingFilter = (e) => {
+    setRating(e.target.value);
+  };
+
+  const rangeHandler = (e) => {
+    setRange(parseInt(e.target.value));
+    console.log("rangeHandler", parseInt(e.target.value));
+  };
+
+  const sorting = (e) => {
+    setSorted(e.target.value);
+  };
+
+  //clear filter Form
+  const clearFilter = () => {
+    setGender([]);
+    setRating("all");
+    setRange(0);
+    setSorted("none");
+  };
 
   // Handle search term and filter products
   const handleSearch = (searchTerm) => {
     if (searchTerm == "") {
-      setProductsData(productsData);
+      setFilteredData(filterByGender);
     } else {
-      const filtered = productDataCopy.filter((product) =>
+      const filtered = filteredData.filter((product) =>
         product.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
-      setProductsData(filtered);
+      setFilteredData(filtered);
     }
   };
 
   // for checking wishlist data
   useEffect(() => {
     setWishlistData(wishlist);
-    if (productsData.length > 0 && wishlistData.length > 0) {
+    if (filteredData.length > 0 && wishlistData.length > 0) {
       let matchedProducts = [];
       wishlistData.map((wishlistItem) => {
         const wishlistProductId = wishlistItem.productInfo?._id;
         if (wishlistProductId) {
-          const matchingProduct = productsData.find(
+          const matchingProduct = filteredData.find(
             (product) => product._id === wishlistProductId
           );
           if (matchingProduct) {
@@ -110,7 +161,7 @@ function ProductPage() {
         setNewStore(matchedProducts);
       }
     }
-  }, [productsData, wishlistData]);
+  }, [filteredData, wishlistData]);
 
   console.log("newStore wishlist data id same as product id:-", newStore);
 
@@ -121,12 +172,12 @@ function ProductPage() {
   console.log("cartStore:---", cartStoreData);
 
   useEffect(() => {
-    if (productsData.length > 0 && cartStoreData.length > 0) {
+    if (filteredData.length > 0 && cartStoreData.length > 0) {
       let matchedProducts = [];
       cartStoreData.map((cartItem) => {
         const cartProductId = cartItem.productInfo?._id;
         if (cartProductId) {
-          const matchingProduct = productsData.find(
+          const matchingProduct = filteredData.find(
             (product) => product._id === cartProductId
           );
           if (matchingProduct) {
@@ -146,7 +197,7 @@ function ProductPage() {
         setCartStore(matchedProducts);
       }
     }
-  }, [productsData, cartStoreData]);
+  }, [filteredData, cartStoreData]);
   console.log("setCartStore:::", cartStore);
 
   //*************** Delete product from cart ***************
@@ -154,65 +205,6 @@ function ProductPage() {
     deleteProductFromCart(product);
     setDeleteAlert(true);
     setTimeout(() => setDeleteAlert(false), 1000);
-  };
-
-  //clear All Filters
-  const clearAllFilters = () => {
-    setProductPrice("");
-    setRequiredRating("");
-    setSortOptionValue("");
-    setProductsData(data.products);
-    console.log("setProductsData :-", data.products);
-  };
-
-  // For clear btn hover
-  const handleMouseEnter = () => setIsHovered(true);
-  const handleMouseLeave = () => setIsHovered(false);
-
-  //Price range Handler
-  const rangeHandler = (event) => {
-    const productPrice = event.target.value;
-    setProductPrice(productPrice); // Update the price state
-    console.log("product Price:-", productPrice);
-
-    if (productPrice.length > 0) {
-      const filteredByPrice = [...productDataCopy].filter(
-        (data) => data.price <= productPrice
-      );
-      console.log("filtered By Price:-", filteredByPrice);
-      setProductsData(filteredByPrice);
-    } else {
-      setProductsData(productsData);
-    }
-  };
-
-  // filter  by rating
-  const productsRatingHandler = (event) => {
-    const requiredRating = event.target.value;
-    setRequiredRating(requiredRating); // Update the rating state
-    console.log("required Rating:-", requiredRating);
-    if (requiredRating) {
-      const filteredByRating = [...productDataCopy].filter(
-        (data) => data.rating === parseInt(requiredRating)
-      );
-      console.log("filter RATING - ", productDataCopy);
-      console.log("filteredByRating:-", filteredByRating);
-      setProductsData(filteredByRating);
-    } else {
-      setProductsData(productsData);
-    }
-  };
-
-  //Sort by Price
-  const SortPrice = (event) => {
-    const sortOption = event.target.value;
-    setSortOptionValue(event.target.value);
-    console.log("sort Option:-", sortOption);
-    const sortedProducts = [...productsData].sort((a, b) =>
-      sortOption === "Low to High" ? a.price - b.price : b.price - a.price
-    );
-    console.log("filter SORT PRICE - ", productsData);
-    setProductsData(sortedProducts);
   };
 
   //****************** error handling while fetching. ******************
@@ -262,73 +254,6 @@ function ProductPage() {
     setIsOpen(!isOpen);
   }
 
-  // CATEGORY HANDLE FETCH CALL
-
-  // fetch all products for category
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await fetch(url);
-        if (!response.ok) {
-          console.log(`HTTP error! status: ${response.status}`);
-        }
-        const data = await response.json();
-        console.log("Fetched Data For all Products:", data);
-        // Process or display the data as needed
-        setAllProducts(data.products);
-      } catch (error) {
-        console.log("Error fetching data:", error.message);
-      }
-    }
-
-    fetchData();
-  }, []);
-  const navigate = useNavigate();
-  //Clothing category Handler
-
-  const categoryHandler = (event) => {
-    const { value, checked } = event.target;
-
-    let updatedCategoryArray;
-
-    if (value === "All") {
-      updatedCategoryArray = checked ? ["All"] : [];
-    } else {
-      updatedCategoryArray = checked
-        ? [...categoryArray, value]
-        : categoryArray.filter((categoryData) => categoryData !== value);
-
-      // If "All" is already in the array and a category is deselected, remove "All"
-      if (updatedCategoryArray.includes("All") && !checked) {
-        updatedCategoryArray = updatedCategoryArray.filter(
-          (categoryData) => categoryData !== "All"
-        );
-      }
-    }
-
-    setCategoryArray(updatedCategoryArray); // Update the state
-
-    // Update products based on the updated category array
-    if (
-      updatedCategoryArray.length === 0 ||
-      updatedCategoryArray.includes("All")
-    ) {
-      // If no categories are selected or "All" is selected, show all products
-      setProductsData(allProducts);
-    } else {
-      // Otherwise, filter products based on selected categories
-      setProductsData(
-        allProducts.filter((data) =>
-          updatedCategoryArray.includes(data.category)
-        )
-      );
-    }
-
-    console.log("categoryArray", updatedCategoryArray);
-  };
-
-  console.log("selectedCategory-", selectedCategory);
-
   //****************** products page ******************
   return (
     <>
@@ -337,14 +262,12 @@ function ProductPage() {
         <div className="container-fluid">
           <div className="row">
             {/************* filters section  *************/}
-
             <div className="col-md-3 bg-light py-3">
               <div className="d-flex justify-content-between">
                 <button
                   className="filter-toggle fs-3 fw-medium"
                   onClick={toggleFilters}
                   style={{
-                    // textDecoration: "underline",
                     border: "none",
                     background: "none",
                   }}
@@ -352,13 +275,10 @@ function ProductPage() {
                   Filters
                 </button>
                 <button
-                  onClick={clearAllFilters}
-                  className="fs-5 fw-normal"
-                  onMouseEnter={handleMouseEnter}
-                  onMouseLeave={handleMouseLeave}
+                  onClick={clearFilter}
+                  id="clearFilterBtn"
+                  className="fs-5 fw-medium"
                   style={{
-                    color: isHovered ? "red" : "black",
-                    // textDecoration: "underline",
                     border: "none",
                     padding: "0px",
                     background: "none",
@@ -375,45 +295,36 @@ function ProductPage() {
                   </label>{" "}
                   <br />
                   <input
-                    onChange={categoryHandler}
-                    type="checkbox"
-                    name="category"
-                    className="me-1 form-check-input"
-                    value="All"
-                    checked={categoryArray.includes("All")}
-                  />
-                  All <br />
-                  <input
-                    onChange={categoryHandler}
+                    onChange={genderFilter}
                     type="checkbox"
                     name="category"
                     className="me-1 form-check-input"
                     value="Men"
-                    checked={categoryArray.includes("Men")}
+                    checked={gender.includes("Men")}
                   />
                   Men <br />
                   <input
-                    onChange={categoryHandler}
+                    onChange={genderFilter}
                     type="checkbox"
                     name="category"
                     className="me-1 form-check-input"
                     value="Women"
-                    checked={categoryArray.includes("Women")}
+                    checked={gender.includes("Women")}
                   />
                   Women <br />
                   <input
-                    onChange={categoryHandler}
+                    onChange={genderFilter}
                     type="checkbox"
                     name="category"
                     className="me-1 form-check-input"
                     value="Kids"
-                    checked={categoryArray.includes("Kids")}
+                    checked={gender.includes("Kids")}
                   />
                   Kids
                   <br />
                 </div>
                 <br />
-                <label htmlFor="customRange3" className="fs-4 fw-medium">
+                <label htmlFor="customRange" className="fs-4 fw-medium">
                   Price Range:
                 </label>
                 <div
@@ -423,17 +334,17 @@ function ProductPage() {
                   {" "}
                   <span className="fs-5"> ₹ 1K</span>{" "}
                   <span className="fs-5">₹ 4K</span>{" "}
-                  <span className="fs-5">₹ 6K</span>{" "}
+                  <span className="fs-5">₹ 7K</span>{" "}
                 </div>
                 <input
                   type="range"
                   className="form-range"
                   onChange={rangeHandler}
-                  value={productPrice}
+                  value={range}
                   min="1000"
                   max="7000"
                   step="200"
-                  id="customRange3"
+                  id="customRange"
                   style={{ width: "86%" }}
                 />
                 <br />
@@ -447,8 +358,8 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="5"
-                    checked={requiredRating == 5}
-                    onChange={productsRatingHandler}
+                    checked={rating == 5}
+                    onChange={ratingFilter}
                   />
                   <i className="bi bi-star-fill text-warning"></i>{" "}
                   <i className="bi bi-star-fill text-warning"></i>{" "}
@@ -460,8 +371,8 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="4"
-                    checked={requiredRating == 4}
-                    onChange={productsRatingHandler}
+                    checked={rating == 4}
+                    onChange={ratingFilter}
                   />
                   <i className="bi bi-star-fill text-warning"></i>{" "}
                   <i className="bi bi-star-fill text-warning"></i>{" "}
@@ -472,8 +383,8 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="3"
-                    checked={requiredRating == 3}
-                    onChange={productsRatingHandler}
+                    checked={rating == 3}
+                    onChange={ratingFilter}
                   />
                   <i className="bi bi-star-fill text-warning"></i>{" "}
                   <i className="bi bi-star-fill text-warning"></i>{" "}
@@ -483,8 +394,8 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="2"
-                    checked={requiredRating == 2}
-                    onChange={productsRatingHandler}
+                    checked={rating == 2}
+                    onChange={ratingFilter}
                   />
                   <i className="bi bi-star-fill text-warning"></i>{" "}
                   <i className="bi bi-star-fill text-warning"></i> <br />
@@ -493,8 +404,8 @@ function ProductPage() {
                     name="rating"
                     className="me-1 form-check-input"
                     value="1"
-                    checked={requiredRating == 1}
-                    onChange={productsRatingHandler}
+                    checked={rating == 1}
+                    onChange={ratingFilter}
                   />
                   <i className="bi bi-star-fill text-warning"></i> <br />
                 </div>
@@ -508,9 +419,9 @@ function ProductPage() {
                     type="radio"
                     name="sortBy"
                     className="me-1 form-check-input"
-                    value="Low to High"
-                    checked={sortOptionValue === "Low to High"}
-                    onChange={SortPrice}
+                    value="lowToHigh"
+                    checked={sorted === "lowToHigh"}
+                    onChange={sorting}
                   />
                   Price - Low to High
                   <br />
@@ -518,9 +429,9 @@ function ProductPage() {
                     type="radio"
                     name="sortBy"
                     className="me-1 form-check-input"
-                    value="High to Low"
-                    checked={sortOptionValue === "High to Low"}
-                    onChange={SortPrice}
+                    value="highToLow"
+                    checked={sorted === "highToLow"}
+                    onChange={sorting}
                   />
                   Price - High to Low <br />
                 </div>
@@ -554,12 +465,12 @@ function ProductPage() {
                 )}
 
                 {/**************** All the products ****************/}
-                {productsData ? (
+                {filteredData ? (
                   <div className="">
                     <h2>All Products</h2>
                     <div className="row py-3">
                       {/***************** map to display data  *****************/}
-                      {productsData.map((data) => (
+                      {filteredData.map((data) => (
                         <div
                           key={data._id}
                           className="col-md-6 col-lg-6 col-xl-4"
