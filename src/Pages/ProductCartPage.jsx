@@ -51,7 +51,7 @@ const ProductCartPage = () => {
   if (error) {
     return (
       <p className="text-center py-5 fs-4 fw-medium text-danger">
-        Error loading Cart Product {error.message}
+        Error loading Cart Product.
       </p>
     );
   }
@@ -214,7 +214,16 @@ const ProductCartPage = () => {
           <div className="row">
             <div className="col-md-7">
               {/******************** Display Cart Data ********************/}
-              {cartListData.length != 0 ? (
+              {loading ? (
+                <div
+                  className="d-flex justify-content-center align-items-center"
+                  style={{ height: "90vh" }}
+                >
+                  <div className="spinner-border text-danger" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                  </div>
+                </div>
+              ) : cartListData.length != 0 ? (
                 <div className="row">
                   {cartListData?.map((data) => (
                     <div key={data._id} className="col-md-12">
@@ -333,16 +342,14 @@ const ProductCartPage = () => {
                   ))}
                 </div>
               ) : (
-                loading && (
-                  <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ height: "90vh" }}
-                  >
-                    <div className="spinner-border text-danger" role="status">
-                      <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>
-                )
+                <div
+                  className="d-flex justify-content-center align-items-center"
+                  style={{ height: "20vh" }}
+                >
+                  <span className="fs-5 fw-medium text-danger">
+                    The cart is empty.
+                  </span>
+                </div>
               )}
             </div>
             <div className="col-md-5">
@@ -358,6 +365,12 @@ const ProductCartPage = () => {
                   className="btn btn-danger w-100 fs-5 fw-medium"
                 >
                   Buy Now
+                </Link>
+                <Link
+                  to="/orderHistory"
+                  className="btn btn-danger w-100 fs-5 fw-medium mt-3"
+                >
+                  My Orders
                 </Link>
               </div>
             </div>

@@ -32,7 +32,6 @@ const AddressContextProvider = ({ children }) => {
       setUserInfo(data.user);
     } catch (error) {
       console.log("Failed to get data from database.");
-      
     }
   };
 
@@ -47,7 +46,6 @@ const AddressContextProvider = ({ children }) => {
 
       const data = await response.json();
       setAddress(data.data);
-      console.log("Address data :-", data);
     } catch (error) {
       console.log("error in getting all the data form address backend.", error);
     }

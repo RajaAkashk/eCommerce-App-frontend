@@ -46,7 +46,7 @@ function ProductPage() {
 
   useEffect(() => {
     if (productCategory === "All") {
-      setGender(["Men", "Women", "Kids"]);
+      setGender([]);
     } else {
       setGender([productCategory]);
     }

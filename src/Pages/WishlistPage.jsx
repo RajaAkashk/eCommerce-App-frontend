@@ -115,78 +115,86 @@ const WishlistPage = () => {
               </div>
             )}
 
-            {wishlist.length > 0
-              ? wishlist.map((data) => (
-                  <div key={data.productInfo._id} className="col-md-4 col-lg-4 col-xl-3">
-                    <div
-                      className="card position-relative mb-4"
-                      style={{ borderRadius: "0px" }}
-                    >
-                      {data.productInfo?.rating && (
-                        <span className="position-absolute top-0 mt-3 ms-2">
-                          <StarRating rating={data.productInfo.rating} />
-                        </span>
-                      )}
-                      {/************ Remove from wishlist btn  ************/}
-                      <i
-                        onClick={() =>
-                          handleRemoveFromWishlist(data.productInfo)
-                        }
-                        className="bi bi-heart-fill text-danger position-absolute top-0 end-0 me-3 mt-2 fs-1"
-                      ></i>
-
-                      <Link to={`/productsPage/${data.productInfo._id}`}>
-                        <img
-                          src={data.productInfo.productImg}
-                          className="card-img-top custom-height"
-                          alt="Clothing Image"
-                          style={{
-                            objectFit: "cover",
-                            borderRadius: "0px",
-                          }}
-                        />
-                      </Link>
-                      <div className="card-body text-center p-0">
-                        <p className="card-title fs-5 fw-normal pt-3">
-                          {data.productInfo.name}
-                        </p>
-                        <p className="card-text py-0 px-3 fs-4 fw-medium">
-                          ₹ {data.productInfo.price}
-                        </p>
-
-                        <button
-                          onClick={(e) => {
-                            if (e.target.innerText === "Add to Cart") {
-                              addProductToCartHandler(data.productInfo);
-                              e.target.innerText = "Remove From Cart";
-                            } else {
-                              deleteProductFromCartHandler(data.productInfo);
-                              e.target.innerText = "Add to Cart";
-                            }
-                          }}
-                          className="btn btn-danger text-light w-100 fs-5 fw-medium"
-                          style={{ borderRadius: "0px" }}
-                        >
-                          {cartStore.find(
-                            (item) => item === data.productInfo._id
-                          )
-                            ? "Remove From Cart"
-                            : "Add to Cart"}
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))
-              : loading && (
+            {loading ? (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ height: "60vh" }}
+              >
+                <div className="spinner-border text-danger" role="status">
+                  <span className="visually-hidden">Loading...</span>
+                </div>
+              </div>
+            ) : wishlist.length > 0 ? (
+              wishlist.map((data) => (
+                <div
+                  key={data.productInfo._id}
+                  className="col-md-4 col-lg-4 col-xl-3"
+                >
                   <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ height: "60vh" }}
+                    className="card position-relative mb-4"
+                    style={{ borderRadius: "0px" }}
                   >
-                    <div className="spinner-border text-danger" role="status">
-                      <span className="visually-hidden">Loading...</span>
+                    {data.productInfo?.rating && (
+                      <span className="position-absolute top-0 mt-3 ms-2">
+                        <StarRating rating={data.productInfo.rating} />
+                      </span>
+                    )}
+                    {/************ Remove from wishlist btn  ************/}
+                    <i
+                      onClick={() => handleRemoveFromWishlist(data.productInfo)}
+                      className="bi bi-heart-fill text-danger position-absolute top-0 end-0 me-3 mt-2 fs-1"
+                    ></i>
+
+                    <Link to={`/productsPage/${data.productInfo._id}`}>
+                      <img
+                        src={data.productInfo.productImg}
+                        className="card-img-top custom-height"
+                        alt="Clothing Image"
+                        style={{
+                          objectFit: "cover",
+                          borderRadius: "0px",
+                        }}
+                      />
+                    </Link>
+                    <div className="card-body text-center p-0">
+                      <p className="card-title fs-5 fw-normal pt-3">
+                        {data.productInfo.name}
+                      </p>
+                      <p className="card-text py-0 px-3 fs-4 fw-medium">
+                        ₹ {data.productInfo.price}
+                      </p>
+
+                      <button
+                        onClick={(e) => {
+                          if (e.target.innerText === "Add to Cart") {
+                            addProductToCartHandler(data.productInfo);
+                            e.target.innerText = "Remove From Cart";
+                          } else {
+                            deleteProductFromCartHandler(data.productInfo);
+                            e.target.innerText = "Add to Cart";
+                          }
+                        }}
+                        className="btn btn-danger text-light w-100 fs-5 fw-medium"
+                        style={{ borderRadius: "0px" }}
+                      >
+                        {cartStore.find((item) => item === data.productInfo._id)
+                          ? "Remove From Cart"
+                          : "Add to Cart"}
+                      </button>
                     </div>
                   </div>
-                )}
+                </div>
+              ))
+            ) : (
+              <div
+                className="d-flex justify-content-center align-items-center"
+                style={{ height: "60vh" }}
+              >
+                <p className="fs-5 fw-medium text-danger">
+                  The wishlist is empty
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </section>
