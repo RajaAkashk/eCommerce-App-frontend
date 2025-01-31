@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 function CheckoutPage() {
   const [message, setMessage] = useState(false);
   const [ChoosenAddress, setAddress] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const { userInfo, getUserInfo, getAllAddress, address, updateUserAddress } =
     useContext(AddressContext);
@@ -24,16 +25,37 @@ function CheckoutPage() {
       parseInt(curr.productInfo.quantity) * parseInt(curr.productInfo.price),
     0
   );
-
-  const finalMessageHandler = async () => {
-    setMessage(true);
+  const checkoutHandler = async () => {
+    setLoading(true);
     try {
-      await deleteAllProductsFromCart(); // Assuming this is async
-      // alert(
-      //   "Cart has been cleared. Information regarding your order will be sent to your email."
-      // );
+      const response = await fetch(
+        "https://e-commerce-app-backend-seven.vercel.app/cart/order/checkout",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            address: ChoosenAddress,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log("Error in checking out", data);
+        return;
+      }
+
+      console.log("Successfully checked out", data);
+      await deleteAllProductsFromCart();
+
+      setLoading(false);
+      setMessage(true);
     } catch (error) {
-      alert("Failed to clear the cart. Please try again.");
+      console.error("Checkout or cart clearing failed:", error);
+      alert("Failed to complete checkout. Please try again.");
     }
   };
 
@@ -44,7 +66,7 @@ function CheckoutPage() {
     const userId = userInfo[0]._id;
     console.log("USER ID :-", userId);
     updateUserAddress(userId, updatedAddress);
-
+    console.log("Address:", ChoosenAddress);
     setAddress(updatedAddress);
     // setUpdateMessage(true);
     // setTimeout(() => setUpdateMessage(false), 1000);
@@ -87,9 +109,6 @@ function CheckoutPage() {
                     <p className="fs-5">
                       <strong>Number: </strong> (+91) {data.phoneNumber}
                     </p>
-                    {/* <p className="fs-5">
-                      <strong>Shipping Address: </strong> {data.address}
-                    </p> */}
                   </div>
                 ))}
                 {/* for selecting an address  */}
@@ -182,12 +201,18 @@ function CheckoutPage() {
                     if (ChoosenAddress === "") {
                       alert("Please select one address");
                     } else {
-                      finalMessageHandler();
+                      checkoutHandler();
                     }
                   }}
-                  disabled={ChoosenAddress === ""}
+                  disabled={ChoosenAddress === "" || loading}
                 >
-                  Checkout
+                  {loading ? (
+                    <div className="spinner-border text-light" role="status">
+                      <span className="visually-hidden">Loading...</span>
+                    </div>
+                  ) : (
+                    "Checkout"
+                  )}
                 </button>
               </div>
             </>

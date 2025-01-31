@@ -9,6 +9,7 @@ import WishlistPage from "./Pages/WishlistPage";
 import ProductCartPage from "./Pages/ProductCartPage";
 import CheckoutPage from "./Pages/CheckoutPage";
 import UserPage from "./Pages/UserPage";
+import OrderHistoryPage from "./Pages/OrderHistoryPage";
 // contexts
 import { WishlistProvider } from "./Contexts/WishlistContext";
 import { CartProvider } from "./Contexts/CartContext";
@@ -43,6 +44,10 @@ const router = createBrowserRouter([
   {
     path: "/userPage",
     element: <UserPage />,
+  },
+  {
+    path: "/orderHistory",
+    element: <OrderHistoryPage />,
   },
 ]);
 
